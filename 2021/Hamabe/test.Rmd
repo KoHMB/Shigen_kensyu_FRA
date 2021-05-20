@@ -1,0 +1,104 @@
+---
+title: "テスト"
+author: "Kohei Hamabe"
+date: "2021/5/20"
+output:
+   html_document:
+    toc: true
+    toc_depth: 3  
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(frasyr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 0. 準備
+
+```{r}
+
+caa  <- read.csv("data/PCM_caa.csv")
+waa  <- read.csv("data/PCM_waa.csv")
+maa  <- read.csv("data/PCM_maa.csv")
+cpue <- read.csv("data/PCM_cpue.csv")
+dat  <- data.handler(caa, waa, maa, cpue, M=0.4)
+ 
+```
+
+
+# 1. チューニング無VPA
+
+```{r}
+
+res1.1 <- vpa(dat=dat,
+              tf.year = 2015:2017,
+              plus.group = TRUE,
+              Pope = TRUE,
+              tune = FALSE,
+              p.init = 0.5
+              )
+plot(colnames(res1.1$baa), res1.1$baa %>% apply(2,sum), type="l",
+     ylab = "資源量", xlab="漁期年")
+
+res1.2 <- vpa(dat=dat,
+              tf.year = 2013:2017,
+              plus.group = TRUE,
+              Pope = TRUE,
+              tune = FALSE,
+              p.init = 0.5
+              )
+plot(colnames(res1.1$baa), res1.1$baa %>% apply(2,sum), type="l",
+     ylab = "資源量", xlab="漁期年")
+lines(colnames(res1.2$baa), res1.2$baa %>% apply(2,sum), col="red", lty=3)
+
+res1.1$faa[,2015:2018]
+res1.2$faa[,2015:2018]
+
+```
+
+- 最終年のFの仮定に対して感度分析を行う
+  - 最近年のFの値で結果が大きく変わる
+  - この結果は最近年のFの仮定に対して不安定
+  - ならば最近年の情報を足して、もう少しデータに基づいた資源評価をしてみよう
+  - ちょうどいいところにCPUEがあるぞ!
+
+
+# 2. チューニングVPA
+
+```{r}
+
+res2.1 <- vpa(dat=dat,
+              tf.year = 2015:2017,
+              plus.group = TRUE,
+              Pope = TRUE,
+              tune = TRUE,
+              p.init = 0.5,
+              sel.update = TRUE,
+              est.method = "ml",
+              term.F = "max",
+              abund = c("N","N","SSB","SSB"),
+              min.age = c(0,0,0,0),
+              max.age = c(0,0,6,6)
+              )
+res2.1$pred.index
+
+
+
+
+res2.1 <- vpa(dat=dat,
+              tf.year = 2015:2017,
+              plus.group = TRUE,
+              Pope = TRUE,
+              tune = TRUE,
+              p.init = 0.5,
+              sel.update = FALSE,
+              est.method = "ml",
+              term.F = "all",
+              abund = c("N","N","SSB","SSB"),
+              min.age = c(0,0,0,0),
+              max.age = c(0,0,6,6)
+              )
+
+```
+

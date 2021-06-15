@@ -2,11 +2,11 @@
 -   [0. 準備](#準備)
 -   [1. チューニング無VPA](#チューニング無vpa)
 -   [2. チューニングVPA](#チューニングvpa)
-    -   [1．最小二乗法推定](#最小二乗法推定)
+    -   [2-1．最小二乗法推定](#最小二乗法推定)
         -   [モデル診断1: 残差プロット](#モデル診断1-残差プロット)
         -   [モデル診断2:
             レトロスペクティブ解析](#モデル診断2-レトロスペクティブ解析)
-    -   [2．最尤推定法](#最尤推定法)
+    -   [2-2．最尤推定法](#最尤推定法)
         -   [モデル診断1: 残差プロット](#モデル診断1-残差プロット-1)
         -   [モデル診断2:
             レトロスペクティブ解析](#モデル診断2-レトロスペクティブ解析-1)
@@ -16,21 +16,21 @@
             レトロスペクティブ解析](#モデル診断2-レトロスペクティブ解析-2)
         -   [モデル選択](#モデル選択)
         -   [観測誤差がデータ間で等分散の最尤推定法(=最小二乗法)](#観測誤差がデータ間で等分散の最尤推定法最小二乗法)
-    -   [bの考慮](#bの考慮)
+    -   [2-3. bの考慮](#bの考慮)
         -   [モデル診断1: 残差プロット](#モデル診断1-残差プロット-3)
         -   [モデル診断2:
             レトロスペクティブ解析](#モデル診断2-レトロスペクティブ解析-3)
-    -   [全F推定法](#全f推定法)
+    -   [2-4. 全F推定法](#全f推定法)
     -   [Index3を取り除いてみる](#index3を取り除いてみる)
         -   [モデル診断2:
             レトロスペクティブ解析](#モデル診断2-レトロスペクティブ解析-4)
--   [VPA計算結果まとめ](#vpa計算結果まとめ)
--   [VPAのモデル診断](#vpaのモデル診断)
-    -   [3. ジッター解析](#ジッター解析)
-    -   [4. 感度分析](#感度分析)
+-   [3. VPA計算結果まとめ](#vpa計算結果まとめ)
+-   [4. VPAのモデル診断](#vpaのモデル診断)
+    -   [4-3. ジッター解析](#ジッター解析)
+    -   [4-4. 感度分析](#感度分析)
         -   [成熟率](#成熟率)
-    -   [5. ジャックナイフ法](#ジャックナイフ法)
-    -   [6. ブートストラップ法](#ブートストラップ法)
+    -   [4-5. ジャックナイフ法](#ジャックナイフ法)
+    -   [4-6. ブートストラップ法](#ブートストラップ法)
         -   [信頼区間の計算](#信頼区間の計算)
         -   [パラメータ間の相関](#パラメータ間の相関)
 -   [まとめ](#まとめ)
@@ -44,6 +44,7 @@
 -   **本研修はフィクションで、実際の資源評価とは関係ありません**
 -   データについてモデル診断を通してコメントするシーンがありますが、これは実際の資源評価のデータに対してのものと異なります
 -   実データに基づいていますが、あくまで研修の例題として考えてください
+    \\
 
 0. 準備
 =======
@@ -74,7 +75,9 @@
     legend("topleft", legend = c("index1","index2","index3","index4"),
            col = 1:4, lty=1:4, ncol=2)
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-1-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-1-1.png" width="400px" />
+
+\\
 
 1. チューニング無VPA
 ====================
@@ -152,9 +155,9 @@
 
     ## Warning: Removed 2 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-2-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-2-1.png" width="400px" />
 
-<font color="red">**まずは最近年のFが推定できているかチェック**</font>
+<font color="Red">**まずは最近年のFが推定できているかチェック**</font>
 
 -   最終年のFの推定が収束していない
 -   漁獲量データから資源動態を推定するのは難しい…
@@ -168,8 +171,8 @@
 -   そこで、資源量指標値のトレンドにフィットさせることで、更に情報の持った資源量推定ができます
 -   これをチューニングVPAといい、チューニングVPAには最適化手法や推定するFの対象に応じて様々な仕様があります
 
-1．最小二乗法推定
------------------
+2-1．最小二乗法推定
+-------------------
 
 -   今、４つの資源量指標値があります
 -   それぞれの資源量指標値の重み（信頼度のようなもの）を等しいとして計算します
@@ -210,7 +213,7 @@
 
     ## Warning: Removed 137 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-3-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-3-1.png" width="400px" />
 
     res2.1$faa[,as.character(2013:2017)]
 
@@ -230,7 +233,7 @@
 
     ## Warning: Removed 2 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-3-2.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-3-2.png" width="400px" />
 
 ### モデル診断1: 残差プロット
 
@@ -243,7 +246,7 @@
 
     ## Warning: Removed 137 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-4-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="400px" />
 
     resid2.1$fitting_Index
 
@@ -251,13 +254,13 @@
 
     ## Warning: Removed 120 row(s) containing missing values (geom_path).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-4-2.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-4-2.png" width="400px" />
 
     resid2.1$abund_Index
 
     ## Warning: Removed 137 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-4-3.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-4-3.png" width="400px" />
 
 ### モデル診断2: レトロスペクティブ解析
 
@@ -288,14 +291,14 @@
 
     ## Warning: Removed 6 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-5-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="400px" />
 
 -   資源量指標値の情報を加えることで、先程までと異なりFの推定が安定したように見えます
 -   ただし、最近SSBが本当に増えているのでしょうか?
 -   確認するにはいろんな方法がありますが、まずは自分でできること、データの扱い方でもう少し検討していきたいと思います
 
-2．最尤推定法
--------------
+2-2．最尤推定法
+---------------
 
 -   先程の最小二乗法の残差プロットを見ます
 -   加入の指標を表すindex1とindex2に対して、親魚の指標であるindex3とindex4は残差が小さく見えます
@@ -334,7 +337,7 @@
 
     ## Warning: Removed 137 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-6-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-6-1.png" width="400px" />
 
     # まずは年齢別漁獲尾数
     res3.1$faa[,as.character(2013:2017)]
@@ -355,7 +358,7 @@
 
     ## Warning: Removed 3 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-6-2.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-6-2.png" width="400px" />
 
     # 観測誤差（各データの重み）を見る
     res3.1$sigma
@@ -390,7 +393,7 @@
 
     ## Warning: Removed 137 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-7-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-7-1.png" width="400px" />
 
     # 資源量とのフィッティング
     resid2.1$fitting_Index+ggtitle("最小二乗法") | resid3.1$fitting_Index+ggtitle("最尤推定法")
@@ -403,7 +406,7 @@
 
     ## Warning: Removed 120 row(s) containing missing values (geom_path).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-7-2.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-7-2.png" width="400px" />
 
     # 資源量と指数の線形関係
     resid2.1$abund_Index+ggtitle("最小二乗法") |resid3.1$abund_Index+ggtitle("最尤推定法")
@@ -412,7 +415,7 @@
 
     ## Warning: Removed 137 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-7-3.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-7-3.png" width="400px" />
 
 ### モデル診断2: レトロスペクティブ解析
 
@@ -431,7 +434,7 @@
 
     ## Warning: Removed 6 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-8-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-8-1.png" width="400px" />
 
 -   Mohn’s rhoが大きくなっちゃった
 -   これは最尤法はデータごとに重み付けを出来る反面、データにオーバーフィットする傾向があることが要因の一つであると言える
@@ -478,7 +481,7 @@
 
     ## Warning: Removed 137 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-9-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-9-1.png" width="400px" />
 
     # まずは年齢別漁獲尾数
     res3.2$faa[,as.character(2013:2017)]
@@ -511,7 +514,7 @@
 
     ## Warning: Removed 3 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-9-2.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-9-2.png" width="400px" />
 
 ### モデル診断1: 残差プロット
 
@@ -534,7 +537,7 @@
 
     ## Warning: Removed 137 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-10-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-10-1.png" width="400px" />
 
     # 資源量とのフィッティング
     resid3.1$fitting_Index|resid3.2$fitting_Index
@@ -547,7 +550,7 @@
 
     ## Warning: Removed 120 row(s) containing missing values (geom_path).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-10-2.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-10-2.png" width="400px" />
 
 -   それほど大きな違いは見られない
 -   重みを共有したことでindex4はより残差が
@@ -569,7 +572,7 @@
 
     ## Warning: Removed 6 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-11-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-11-1.png" width="400px" />
 
 -   やはりFのレトロの結果が収束していない
 -   資源量についても過小推定のレトロバイアスが見られる
@@ -631,7 +634,7 @@ VPA-07動画の宿題の答えです。試してみてください。
 
     ## Warning: Removed 137 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-13-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-13-1.png" width="400px" />
 
     res3.3$faa[,as.character(2013:2017)]
 
@@ -655,8 +658,8 @@ VPA-07動画の宿題の答えです。試してみてください。
     ## 5 0.909479347 0.26088313 0.252274461 0.23518186 0.28240884
     ## 6 0.909479347 0.26088313 0.252274461 0.23518186 0.28240884
 
-bの考慮
--------
+2-3. bの考慮
+------------
 
 -   目を凝らして残差プロットを見てみますと、資源量と資源量指数の線形性に疑問を感じ始めました
 
@@ -697,7 +700,7 @@ bの考慮
 
     ## Warning: Removed 137 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-14-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-14-1.png" width="400px" />
 
     res4.1$b
 
@@ -765,7 +768,7 @@ bの考慮
 
     ## Warning: Removed 137 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-15-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-15-1.png" width="400px" />
 
     res4.2$faa[,as.character(2013:2017)]
 
@@ -812,7 +815,7 @@ bの考慮
 
     ## Warning: Removed 137 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-15-2.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-15-2.png" width="400px" />
 
     res4.3$faa[,as.character(2013:2017)]
 
@@ -871,7 +874,7 @@ bの考慮
 
     ## Warning: Removed 137 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-17-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-17-1.png" width="400px" />
 
     # 資源量とのフィッティング
     resid4.2$fitting_Index
@@ -880,14 +883,14 @@ bの考慮
 
     ## Warning: Removed 120 row(s) containing missing values (geom_path).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-17-2.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-17-2.png" width="400px" />
 
     # 資源量と資源量指数の関係
     resid4.2$abund_Index
 
     ## Warning: Removed 137 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-17-3.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-17-3.png" width="400px" />
 
 ### モデル診断2: レトロスペクティブ解析
 
@@ -906,13 +909,13 @@ bの考慮
 
     ## Warning: Removed 6 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-18-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-18-1.png" width="400px" />
 
 -   まだバイオマスに過小推定のレトロバイアスが見られる
 -   前のモデルよりMohn’s rhoは小さくなってきている
 
-全F推定法
----------
+2-4. 全F推定法
+--------------
 
     res5.1 <- vpa(dat,
                   tf.year = 2015:2017,
@@ -947,7 +950,7 @@ bの考慮
 
     ## Warning: Removed 137 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-19-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-19-1.png" width="400px" />
 
     res5.1$b
 
@@ -1016,7 +1019,7 @@ Index3を取り除いてみる
 
     ## Warning: Removed 104 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-20-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-20-1.png" width="400px" />
 
     plot_vpa(list(res4.2=res4.2, res6.1=res6.1),
              what.plot = c("SSB", "biomass", "U", "Recruitment",
@@ -1024,7 +1027,7 @@ Index3を取り除いてみる
 
     ## Warning: Removed 2 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-20-2.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-20-2.png" width="400px" />
 
 残差プロットやCPUEへのフィッティングを見る限り、決して悪くはありません。
 自己相関係数そのもの値も低く、フィットはいいかと思います。
@@ -1047,15 +1050,15 @@ Index3を取り除いてみる
 
     ## Warning: Removed 6 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-21-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-21-1.png" width="400px" />
 
 Mohnのrhoを見て頂いても明確ですが、Index3を抜くことで決してレトロバイアスが減るわけではありません。
 推定精度が良くなるわけでもないですし、データを抜くというのは恣意的な作業の一つでもあります。
 （データが不完全、あるいは標準化されていない等の情報がない限り）
 したがって、これまで通り4本の資源量指標値の結果を用いて、今後のモデル診断も進めていきたいと思います。
 
-VPA計算結果まとめ
-=================
+3. VPA計算結果まとめ
+====================
 
     plot_vpa(list(tVPA_ls = res2.1, tVPA_ml = res3.2, tVPA_ml_b = res4.2), 
              what.plot = c("SSB", "biomass", "U", "Recruitment",
@@ -1063,12 +1066,12 @@ VPA計算結果まとめ
 
     ## Warning: Removed 3 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-22-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-22-1.png" width="400px" />
 
 この後、詳細なモデル診断を進めていきますが、その前に一つベースモデルを決めておきたいと思います。
 
 ここまでの流れに従って、ここでは`res4.2`をベースモデルとしてその妥当性をより評価していきたいと思います。
-//
+\\
 
 **`res4.2`**
 
@@ -1079,28 +1082,28 @@ VPA計算結果まとめ
 -   観測誤差 : Index1&2, Index3&4で2つ推定
 -   b : Index1以外について推定
 
-VPAのモデル診断
-===============
+4. VPAのモデル診断
+==================
 
 先程、ベースモデルと定めた`res4.2`に対してモデル診断を行っていきます。
 
 ここで紹介するモデル診断手法は6つです
 
--   <font color="gray">1. 残差プロット(済)</font>
--   <font color="gray">2. レトロスペクティブ解析(済)</font>
--   1.  ジッター解析
+-   <font color="Gray">1. 残差プロット(済)</font>\\
+-   <font color="Gray">2. レトロスペクティブ解析(済)</font>\\
+-   1.  ジッター解析\\
 
--   1.  感度分析
+-   1.  感度分析\\
 
--   1.  ジャックナイフ法
+-   1.  ジャックナイフ法\\
 
--   1.  ブートストラップ法
+-   1.  ブートストラップ法\\
 
-//
+\\
 既に残差プロットとレトロスペクティブ解析については見てきたので、3番目のジッター解析からより詳細にモデルの妥当性を検討していきたいと思います
 
-3. ジッター解析
----------------
+4-3. ジッター解析
+-----------------
 
     res_jitter <- do_estcheck_vpa(res4.2, n_ite=10)
 
@@ -1122,7 +1125,7 @@ VPAのモデル診断
 
     ## Iteration 1 has done ...
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-23-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-23-1.png" width="400px" />
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
@@ -1138,7 +1141,7 @@ VPAのモデル診断
 
     ## Iteration 2 has done ...
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-23-2.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-23-2.png" width="400px" />
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
@@ -1154,7 +1157,7 @@ VPAのモデル診断
 
     ## Iteration 3 has done ...
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-23-3.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-23-3.png" width="400px" />
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
@@ -1170,7 +1173,7 @@ VPAのモデル診断
 
     ## Iteration 4 has done ...
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-23-4.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-23-4.png" width="400px" />
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
@@ -1186,7 +1189,7 @@ VPAのモデル診断
 
     ## Iteration 5 has done ...
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-23-5.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-23-5.png" width="400px" />
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
@@ -1202,7 +1205,7 @@ VPAのモデル診断
 
     ## Iteration 6 has done ...
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-23-6.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-23-6.png" width="400px" />
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
@@ -1218,7 +1221,7 @@ VPAのモデル診断
 
     ## Iteration 7 has done ...
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-23-7.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-23-7.png" width="400px" />
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
@@ -1234,7 +1237,7 @@ VPAのモデル診断
 
     ## Iteration 8 has done ...
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-23-8.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-23-8.png" width="400px" />
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
@@ -1250,7 +1253,7 @@ VPAのモデル診断
 
     ## Iteration 9 has done ...
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-23-9.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-23-9.png" width="400px" />
 
     ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
@@ -1270,13 +1273,15 @@ VPAのモデル診断
 
     ## Successful convergence for all iterations !!
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-23-10.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-23-10.png" width="400px" />
 
     ## Maximum likelihood in jitter analysis is:  -77.83049 
     ## Likelihood with estimated parameters is:  -77.83049
 
-4. 感度分析
------------
+\\
+
+4-4. 感度分析
+-------------
 
 -   VPAで仮定している様々な仮定に対して、値を変えた場合に資源推定結果などにどのような影響を与えるか確認します
 -   どの値を感度分析の対象にするかで、関数中の引数が変わります
@@ -1305,13 +1310,14 @@ VPAのモデル診断
 
     ## Warning: Removed 3 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-24-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-24-1.png" width="400px" />
 
 最近年の成熟率がSSBに与える影響が大きいのはある意味想定内です
 加入やバイオマス全体の動態が大きく変動していないので、この生物学的パラメータに対してある程度頑健であると言えます
+\\
 
-5. ジャックナイフ法
--------------------
+4-5. ジャックナイフ法
+---------------------
 
 データ（資源量指標値）を1本ずつ取り除いて推定結果がどれだけ変動するか見る診断手法です。
 これによってデータの影響力や外れ値が資源量推定結果に与える影響を見ることができます
@@ -1334,7 +1340,7 @@ VPAのモデル診断
 
     ## Warning: Removed 2705 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-25-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-25-1.png" width="400px" />
 
 Index1がないと加入量や資源量が大きく推定されることが分かります。
 逆にIndex1は最近年の資源量を低くする影響が強いと言えます。
@@ -1346,7 +1352,7 @@ Index1がないと加入量や資源量が大きく推定されることが分�
 
     ## Warning: Removed 137 rows containing missing values (geom_point).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-26-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-26-1.png" width="400px" />
 
 改めてIndex1の残差プロットを見ると、残差が負の方向に大きな外れ値が2つ、2006年と2014年に見られます。
 
@@ -1369,10 +1375,11 @@ Index1がないと加入量や資源量が大きく推定されることが分�
 
 さて、もう一つがIndex3を除いた(×印)場合の結果についてです。このデータは残差の自己相関係数が有意でモデルの妥当性について疑問が残っていたところかと思います。
 さきほどの`res6.1`では、実際に取り除いて確認しましたが、ここでも同じことをしています。そしてこのデータを抜いても資源量推定の傾向などに大きな違いがないことがなく、その影響力は限定的だということが分かります。
-このデータの影響力が大きく、かつその残差に自己相関係数が有意に大きいという場合は、取り除く必要もあるかと思いますが、そうでない以上このデータを使っても問題はないと考えます。
+このデータの影響力が大きく、かつその残差に自己相関係数が有意に大きいという場合は、取り除く必要もあるかと思いますが、そうでない以上このデータを使っても問題はないと考えます。  
+\\
 
-6. ブートストラップ法
----------------------
+4-6. ブートストラップ法
+-----------------------
 
     res_boot <- plot_resboot_vpa(res4.2, B_ite = 100)
 
@@ -1398,7 +1405,7 @@ Index1がないと加入量や資源量が大きく推定されることが分�
 
     ## Warning: Removed 1 row(s) containing missing values (geom_path).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-30-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-30-1.png" width="400px" />
 
     # 2000年以降でプロット
     res_boot$plot_ssb+ggtitle("SSB")+xlim(2000,2018) |
@@ -1411,25 +1418,25 @@ Index1がないと加入量や資源量が大きく推定されることが分�
 
     ## Warning: Removed 31 row(s) containing missing values (geom_path).
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-30-2.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-30-2.png" width="400px" />
 
 #### VPAで考えられる不確実性の限界
 
 これまでにVPAは最終年のFでしか資源量推定結果をコントロールできないと話してきたかと思います。これは最終年のFが求まると、そこから遡って計算される過去の資源量はモデルの式通りに計算され、10年もすれば資源量指標値によるチューニングの効果もほとんどなくなってしまいます。
 
-最近年の資源量推定結果がFの推定法や最適化手法で大きく異なると議論をしてきましたが、これらは十分に信頼区間の範囲の中です。それだけ最近年のこの資源の推定結果は不確実さが高いことをこれまでの解析でも感じてきましたし、なによりこのブートストラップ法というモデル診断が示していることになります。
+最近年の資源量推定結果がFの推定法や最適化手法で大きく異なると議論をしてきましたが、これらは十分に信頼区間の範囲の中です。それだけ**最近年のこの資源の推定結果は不確実さが高いことをこれまでの解析でも感じてきましたし、なによりこのブートストラップ法というモデル診断が示している**ことになります。
 
 #### 過去の不確実性は決して小さくない
 
-そしてもう一つ、過去の信頼区間が非常に狭いですが、これは過去の推定精度が高いことを意味しているわけではありません。VPAというモデルの仮定の基ではこうなる他ないだけです。特に、海外の資源評価などでは今年の資源量と今年の資源量との変動に、確率的な誤差（過程誤差と言います）を加えていたり、あるいは年齢別漁獲尾数についても誤差を考えていたりします。
+そしてもう一つ、過去の信頼区間が非常に狭いですが、これは過去の推定精度が高いことを意味しているわけではありません。VPAというモデルの仮定の基ではこうなる他ないだけです。特に、海外の資源評価などでは今年の資源量と去年の資源量との変動に、確率的な誤差（過程誤差と言います）を加えていたり、あるいは年齢別漁獲尾数についても誤差を考えていたりします。
 
 **これらのデータに不確実性がないとしたモデル**があくまで**VPA**ですが、現実にはこのような誤差はあるものです。
 
-例として、台風の進路予報を上げたいと思います。台風の進路予報は台風の進路上の気圧配置、偏西風の強さや角度など、いろんな値を基に進路の予報円という形で、中心線とともに不確実さを知らせてくれるツールです。ただ時折、予報円を逸れてくる台風もあります。これは例えば台風予測で考えていないデータが引き起こしたもの（例、海面水温、発生したときの環境とか）が原因で、予期せぬ進路を取ったとします。
+例として、台風の進路予報を上げたいと思います。台風の進路予報は台風の進路上の気圧配置、偏西風の強さや角度など、いろんな値を基に進路の予報円という形で、中心線とともに不確実さを知らせてくれるツールです。ただ時折、予報円を逸れてくる台風もあります。これは例えば台風予測で考えていないデータやその不確実性が引き起こしたもの（例、海面水温、発生したときの環境の測定誤差とか）が原因で、予期せぬ進路を取ったとします。
 これをVPAについて置き換えると以下のようになります。
 
 -   考えたデータの不確実性：資源量指標値（台風の例だと気圧配置）
--   考えていないデータの不確実性：年齢別漁獲尾数、年齢別体重、等々（台風の例だと海面水温）
+-   考えていないデータとそのの不確実性：年齢別漁獲尾数、年齢別体重、等々（台風の例だと海面水温）
 
 もちろん実際の台風の予測では海面水温等も使っているはずですが、イメージしやすいあくまで例です。
 
@@ -1459,7 +1466,7 @@ Index1がないと加入量や資源量が大きく推定されることが分�
 
     ## Warning in cor(x, y): 標準偏差が 0 です
 
-![](test_masaba_files/figure-markdown_strict/unnamed-chunk-31-1.png)
+<img src="test_masaba_files/figure-markdown_strict/unnamed-chunk-31-1.png" width="400px" />
 
 まず最終年のFは各年齢間で強い相関があることが分かります。これは選択率更新法では最終年最高齢のFしか推定していないので、その後はVPA計算の中でFが一意に決まっていることからも、想定通りです。
 

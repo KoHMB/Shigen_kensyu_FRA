@@ -1,4 +1,4 @@
--   [はじめに…](#はじめに)
+-   [はじめに](#はじめに)
 -   [0. 準備](#準備)
 -   [1. チューニング無VPA](#チューニング無vpa)
 -   [2. チューニングVPA](#チューニングvpa)
@@ -36,15 +36,14 @@
 -   [まとめ](#まとめ)
     -   [資料・参考文献](#資料参考文献)
 
-はじめに…
-=========
+はじめに
+========
 
--   2018年までのマサバ太平洋系群データを使ってVPA計算とモデル診断を模擬的に行います
+-   実際にある資源のデータを使ってVPA計算とモデル診断を模擬的に行います
 -   資源管理研修用に少し調整したデータとなっています
 -   **本研修はフィクションで、実際の資源評価とは関係ありません**
 -   データについてモデル診断を通してコメントするシーンがありますが、これは実際の資源評価のデータに対してのものと異なります
--   実データに基づいていますが、あくまで研修の例題として考えてください
-    \\
+-   実データに基づいていますが、あくまで研修の例題として考えてください\\
 
 0. 準備
 =======
@@ -52,13 +51,12 @@
     # frasyrの呼び出し
     library(frasyr)
 
-    caa  <- read.csv("data/caa0_2020.csv", row.names = 1)[,-(50:51)]
-    waa  <- read.csv("data/waa1_2020.csv", row.names = 1)[,-(50:51)]
-    maa  <- read.csv("data/maa2_2020.csv", row.names = 1)[,-(50:51)]
-    cpue <- read.csv("data/cpue2_aicc2020.csv", row.names = 1)[,-(50:51)]
+    caa  <- read.csv("data/caa0_2020.csv", row.names = 1)
+    waa  <- read.csv("data/waa1_2020.csv", row.names = 1)
+    maa  <- read.csv("data/maa2_2020.csv", row.names = 1)
+    cpue <- read.csv("data/cpue2_aicc2020.csv", row.names = 1)
     dat  <- data.handler(caa, waa, maa, cpue, M=0.4)
     dat$index[1:2,"2018"] <- NA 
-    dat$caa[,"2018"] <- rep(0, nrow(dat$caa))
 
     # 資源量指数のプロット
     cpue2 <- cpue
@@ -76,8 +74,6 @@
            col = 1:4, lty=1:4, ncol=2)
 
 ![](test_masaba_files/figure-markdown_strict/unnamed-chunk-2-1.png)
-
-\\
 
 1. チューニング無VPA
 ====================
@@ -664,6 +660,7 @@ VPA-07動画の宿題の答えです。試してみてください。
 -   目を凝らして残差プロットを見てみますと、資源量と資源量指数の線形性に疑問を感じ始めました
 
 *I*<sub>*t*</sub> = *q**B*<sub>*t*</sub><sup>*b*</sup>
+
 という関係があって、普段は*b* = 1です。
 
 したがって、この関数は比例の直線みたいになっています。
@@ -1374,16 +1371,16 @@ Index2がないと加入量や資源量が大きく推定されることが分�
 --------------
 
 -   令和2年度(2020年度)資源管理研修
-    -   VPA-01: frasyrを用いたVPA 概要編
-        (<a href="https://www.youtube.com/watch?v=RSPX-SVMYog" class="uri">https://www.youtube.com/watch?v=RSPX-SVMYog</a>)
-    -   VPA-02: frasyrを用いたVPA 実践編1
-        (<a href="https://www.youtube.com/watch?v=EuQja8yIOsc" class="uri">https://www.youtube.com/watch?v=EuQja8yIOsc</a>)
-    -   VPA-03: frasyrを用いたVPA 実践編2
-        (<a href="https://www.youtube.com/watch?v=TErDeB9rQf8" class="uri">https://www.youtube.com/watch?v=TErDeB9rQf8</a>)
-    -   VPA-04: VPAのモデル診断 概要編
-        (<a href="https://www.youtube.com/watch?v=xIloudJfHnc" class="uri">https://www.youtube.com/watch?v=xIloudJfHnc</a>)
-    -   VPA-05: VPAのモデル診断 実践編
-        (<a href="https://www.youtube.com/watch?v=JY6am-rNzPc" class="uri">https://www.youtube.com/watch?v=JY6am-rNzPc</a>)
+    -   [VPA-01: frasyrを用いたVPA
+        概要編](https://www.youtube.com/watch?v=RSPX-SVMYog)
+    -   [VPA-02: frasyrを用いたVPA
+        実践編1](https://www.youtube.com/watch?v=EuQja8yIOsc)
+    -   [VPA-03: frasyrを用いたVPA
+        実践編2](https://www.youtube.com/watch?v=TErDeB9rQf8)
+    -   [VPA-04: VPAのモデル診断
+        概要編](https://www.youtube.com/watch?v=xIloudJfHnc)
+    -   [VPA-05: VPAのモデル診断
+        実践編](https://www.youtube.com/watch?v=JY6am-rNzPc)
 -   frasyr内のスクリプト
     -   VPAについて(<a href="https://ichimomo.github.io/frasyr/articles/vpa.html" class="uri">https://ichimomo.github.io/frasyr/articles/vpa.html</a>)
     -   VPAのモデル診断について(<a href="https://ichimomo.github.io/frasyr/articles/Diagnostics-for-VPA.html" class="uri">https://ichimomo.github.io/frasyr/articles/Diagnostics-for-VPA.html</a>)

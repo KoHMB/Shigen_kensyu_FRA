@@ -14,8 +14,8 @@ setwd("C:/Users/00007920/Desktop/GitHub_repository/Shigen_kensyu_FRA/2021/Hamabe
 library(ggplot2)
 library(frasyr)
 library(patchwork)
-knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_chunk$set(out.width="400px", dpi=120)
+knitr::opts_chunk$set(echo = TRUE, fig.height = 15, fig.width = 14)
+#knitr::opts_chunk$set(out.width="400px", dpi=120)
 
 ```
 
@@ -30,11 +30,16 @@ knitr::opts_chunk$set(out.width="400px", dpi=120)
 
 # 0. 準備
 
-
-```{r}
+```{r, eval=FALSE}
 
 # frasyrの呼び出し
 library(frasyr)
+
+```
+
+
+
+```{r}
 
 caa  <- read.csv("data/caa0_2020.csv", row.names = 1)[,-(50:51)]
 waa  <- read.csv("data/waa1_2020.csv", row.names = 1)[,-(50:51)]
@@ -423,6 +428,8 @@ res4.1$b
 
 res4.1$faa[,as.character(2013:2017)]
 
+resid4.1 <- plot_residual_vpa(res4.1)
+resid4.1$abund_Index
 
 ```
 
@@ -488,11 +495,11 @@ res4.3 <- vpa(dat=dat,
 res4.3$faa[,as.character(2013:2017)]
 
 # bの値の比較
-data.frame(Model = c(4.1, 4.2),
-           index1 = c(res4.1$b[1], res4.2$b[1]),
-           index2 = c(res4.1$b[2], res4.2$b[2]),
-           index3 = c(res4.1$b[3], res4.2$b[3]),
-           index4 = c(res4.1$b[4], res4.2$b[4])
+data.frame(Model = c(4.1, 4.2, 4.3),
+           index1 = c(res4.1$b[1], res4.2$b[1], res4.3$b[1]),
+           index2 = c(res4.1$b[2], res4.2$b[2], res4.3$b[2]),
+           index3 = c(res4.1$b[3], res4.2$b[3], res4.3$b[3]),
+           index4 = c(res4.1$b[4], res4.2$b[4], res4.3$b[4])
            )
 
 ```
@@ -501,9 +508,9 @@ data.frame(Model = c(4.1, 4.2),
 ```{r}
 
 aic3.2 <- -2*res3.2$logLik
-aic4.1 <- -2*res4.1$logLik+2*4
-aic4.2 <- -2*res4.2$logLik+2*3
-aic4.3 <- -2*res4.3$logLik+2*3
+aic4.1 <- -2*res4.1$logLik+2*4  # 4つののbを推定しました
+aic4.2 <- -2*res4.2$logLik+2*3  # Index1を除く3つのbを推定しました
+aic4.3 <- -2*res4.3$logLik+2*2  # Index1と2を除く2つのbを推定しました
 
 data.frame(Model=c(3.2, 4.1, 4.2, 4.3),
            deltaAIC = c(aic3.2-min(c(aic3.2, aic4.1, aic4.2, aic4.3)),
@@ -522,16 +529,16 @@ data.frame(Model=c(3.2, 4.1, 4.2, 4.3),
 
 ```{r}
 
-resid4.2 <- plot_residual_vpa(res4.2, plot_year = 2000:2018)
+resid4.3 <- plot_residual_vpa(res4.3, plot_year = 2000:2018)
 
 # 残差の時系列プロット
-resid4.2$year_resid
+resid4.3$year_resid+ggtitle("res4.3") | resid3.2$year_resid+ggtitle("res3.2")
 
 # 資源量とのフィッティング
-resid4.2$fitting_Index
+resid4.3$fitting_Index+ggtitle("res4.3") | resid3.2$fitting_Index+ggtitle("res3.2")
 
 # 資源量と資源量指数の関係
-resid4.2$abund_Index
+resid4.3$abund_Index+ggtitle("res4.3") | resid3.2$abund_Index+ggtitle("res3.2")
 
 ```
 
@@ -540,8 +547,8 @@ resid4.2$abund_Index
 
 ```{r}
 
-retro4.2 <- do_retrospective_vpa(res4.2)
-retro4.2$graph
+retro4.3 <- do_retrospective_vpa(res4.3)
+retro4.3$graph
 
 ```
 
@@ -549,6 +556,14 @@ retro4.2$graph
 - 前のモデルよりMohn's rhoは小さくなってきている
 
 
+#### ggplot小話
+
+```{r}
+
+retro4.3$graph+xlim(2005,2018)
+retro4.3$graph+xlim(2005,2018)+ggtitle("モデル4.3のレトロ解析")
+
+```
 
 
 ## 2-4. 全F推定法
@@ -571,12 +586,10 @@ res5.1 <- vpa(dat,
             fc.year=2016:2018,
             plot = TRUE,
             plot.year = 2002:2018,
-            p.init=res4.2$faa[,"2017"][-7],
             use.index =1:4,
             sigma.constraint = c(1,1,2,2) #北上期と秋季のsigmaを一定
 )
 
-res5.1$b
 res5.1$faa[,as.character(2013:2017)]
 
 
@@ -618,12 +631,12 @@ res6.1 <- vpa(dat=dat,
               sigma.constraint = c(1,1,2,2),
               b.est = TRUE,
               b.fix = c(1,NA,NA),
-              p.init = res4.2$term.f,
+              p.init = res4.3$term.f,
               plot = TRUE,
               plot.year = 2002:2018
               )
 
-plot_vpa(list(res4.2=res4.2, res6.1=res6.1),
+plot_vpa(list(res4.3=res4.3, res6.1=res6.1),
          what.plot = c("SSB", "biomass", "U", "Recruitment",
                        "fish_number", "fishing_mortality"))
 
@@ -652,7 +665,7 @@ Mohnのrhoを見て頂いても明確ですが、Index3を抜くことで決し�
 
 ```{r}
 
-plot_vpa(list(tVPA_ls = res2.1, tVPA_ml = res3.2, tVPA_ml_b = res4.2), 
+plot_vpa(list(non_tVPA = res1.1, tVPA_ls = res2.1, tVPA_ml = res3.2, tVPA_ml_b = res4.3), 
          what.plot = c("SSB", "biomass", "U", "Recruitment",
                        "fish_number", "fishing_mortality"))
 
@@ -660,22 +673,22 @@ plot_vpa(list(tVPA_ls = res2.1, tVPA_ml = res3.2, tVPA_ml_b = res4.2),
 
 この後、詳細なモデル診断を進めていきますが、その前に一つベースモデルを決めておきたいと思います。
 
-ここまでの流れに従って、ここでは`res4.2`をベースモデルとしてその妥当性をより評価していきたいと思います。
+ここまでの流れに従って、ここでは`res4.3`をベースモデルとしてその妥当性をより評価していきたいと思います。
 \\
 
-**`res4.2`**
+**`res4.3`**
 
 - チューニング : 資源量指標値4つ
 - ターミナルF : 最終年最高齢F
 - 選択率更新法 : あり
 - 最適化手法 : 最尤推定法
 - 観測誤差 : Index1&2, Index3&4で2つ推定
-- b : Index1以外について推定
+- b : Index3、4について推定
 
 
 # 4. VPAのモデル診断
 
-先程、ベースモデルと定めた`res4.2`に対してモデル診断を行っていきます。
+先程、ベースモデルと定めた`res4.3`に対してモデル診断を行っていきます。
 
 ここで紹介するモデル診断手法は6つです
 
@@ -694,10 +707,18 @@ plot_vpa(list(tVPA_ls = res2.1, tVPA_ml = res3.2, tVPA_ml_b = res4.2),
 
 ```{r}
 
-res_jitter <- do_estcheck_vpa(res4.2, n_ite=10)
+res_jitter <- do_estcheck_vpa(res4.3, n_ite=10)
 
 ```
 
+```{r}
+
+res_jitter$graph$likelihood+geom_vline(aes(xintercept=res4.3$input$p.init), linetype=2)
+
+res_jitter$graph$estimated
+res_jitter$graph$estimated+ylim(0,NA)
+
+```
 
 
 \\
@@ -721,7 +742,7 @@ sensitive.maa1 <- sensitive.maa2 <- dat$maa
 sensitive.maa1[4, 47:49] <- 1
 sensitive.maa2[, 46:49] <- dat$maa[,45]
 
-res_sensitivity <- do_sensitivity_vpa(res4.2, what_replace = "maa", 
+res_sensitivity <- do_sensitivity_vpa(res4.3, what_replace = "maa", 
                                       value =list(sensitive.maa1,
                                                   sensitive.maa2),                                          what_plot=c("SSB","biomass","U","Recruitment",
                                       "fish_number","fishing_mortality"), 
@@ -743,42 +764,26 @@ res_sensitivity$graph
 
 ```{r}
 
-res_jackknife <- do_jackknife_vpa(res4.2,
+res_jackknife <- do_jackknife_vpa(res4.3,
                                   what_plot=c("SSB","biomass","U","Recruitment",
                                               "fish_number","fishing_mortality"),
                                   ncol = 3,
                                   plot_year = 2000:2018)
 res_jackknife$JKplot_vpa
+res_jackknife$JKplot_par
 
 ```
 
-Index1がないと加入量や資源量が大きく推定されることが分かります。
-逆にIndex1は最近年の資源量を低くする影響が強いと言えます。
-しかし、Index1の観測誤差は決して小さくないので、この傾向は少し感覚と合わないところもあります
+Index2がないと加入量や資源量が大きく推定されることが分かります。
+その次にIndex1はの影響が大きく見えます。
+いずれも加入の指標ですが、これは2013年の大きな値へフィットしにくくなる、2013年の加入尾数が低く推定される。結果として最近年の資源尾数が低くなるというこ戸田と考えます
 
 ```{r, echo=FALSE}
-resid4.2$year_resid
+resid4.3$fitting_Index
 ```
 
-改めてIndex1の残差プロットを見ると、残差が負の方向に大きな外れ値が2つ、2006年と2014年に見られます。
 
-2014年以降の残差について取り出してみて、2014年のIndex1について影響を見てみたいと思います
-
-```{r}
-
-resid2014 <- resid4.2$gg_data[resid4.2$gg_data$year>2013,"resid"]
-
-#全てのデータで足し算
-sum(resid2014$resid, na.rm = TRUE)
-#2014年のIndex1を除いて足し算
-sum(resid2014$resid[-1], na.rm = TRUE)
-
-```
-
-2014年以降のデータ全ての残差の総和は-1.37です。一方、この残差から2014年のIndex1の残差だけを除いた総和は1.7です。
-厳密には最尤推定法に寄すパラメータ推定で、データの重みが異なるので単純にこの計算の通りにはなりませんが、2014年Index1が与えている影響が大きいことは分かるかと思います。
-
-さて、もう一つがIndex3を除いた(×印)場合の結果についてです。このデータは残差の自己相関係数が有意でモデルの妥当性について疑問が残っていたところかと思います。
+さて、Index3を除いた(×印)場合の結果についてです。このデータは残差の自己相関係数が有意でモデルの妥当性について疑問が残っていたところかと思います。
 さきほどの`res6.1`では、実際に取り除いて確認しましたが、ここでも同じことをしています。そしてこのデータを抜いても資源量推定の傾向などに大きな違いがないことがなく、その影響力は限定的だということが分かります。
 このデータの影響力が大きく、かつその残差に自己相関係数が有意に大きいという場合は、取り除く必要もあるかと思いますが、そうでない以上このデータを使っても問題はないと考えます。  
 \\
@@ -788,7 +793,7 @@ sum(resid2014$resid[-1], na.rm = TRUE)
 
 ```{r, eval=FALSE}
 
-res_boot <- plot_resboot_vpa(res4.2, B_ite = 100)
+res_boot <- plot_resboot_vpa(res4.3, B_ite = 100)
 
 ```
 

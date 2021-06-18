@@ -33,8 +33,7 @@
     -   [4-6. ブートストラップ法](#ブートストラップ法)
         -   [信頼区間の計算](#信頼区間の計算)
         -   [パラメータ間の相関](#パラメータ間の相関)
--   [まとめ](#まとめ)
-    -   [資料・参考文献](#資料参考文献)
+-   [資料・参考文献](#資料参考文献)
 
 はじめに
 --------
@@ -1223,7 +1222,6 @@ Mohnのrhoを見て頂いても明確ですが、Index3を抜くことで決し�
 
 最近年の成熟率がSSBに与える影響が大きいのはある意味想定内です
 加入やバイオマス全体の動態が大きく変動していないので、この生物学的パラメータに対してある程度頑健であると言えます
-\\
 
 4-5. ジャックナイフ法
 ---------------------
@@ -1407,11 +1405,8 @@ Index2がないと加入量や資源量が大きく推定されることが分�
 推定最終年のSSBはもちろん最終年のFの推定値と強い相関がありますが、これはVPAの計算上こうなるものです。
 一方、bについてはb2を除いては相関しているわけではないことも確認されました。
 
-まとめ
-======
-
 資料・参考文献
---------------
+==============
 
 -   令和2年度(2020年度)資源管理研修
     -   [VPA-01: frasyrを用いたVPA
@@ -1425,8 +1420,8 @@ Index2がないと加入量や資源量が大きく推定されることが分�
     -   [VPA-05: VPAのモデル診断
         実践編](https://www.youtube.com/watch?v=JY6am-rNzPc)
 -   frasyr内のスクリプト
-    -   VPAについて(<a href="https://ichimomo.github.io/frasyr/articles/vpa.html" class="uri">https://ichimomo.github.io/frasyr/articles/vpa.html</a>)
-    -   VPAのモデル診断について(<a href="https://ichimomo.github.io/frasyr/articles/Diagnostics-for-VPA.html" class="uri">https://ichimomo.github.io/frasyr/articles/Diagnostics-for-VPA.html</a>)
+    -   [VPA関数を使った資源量推定](https://ichimomo.github.io/frasyr/articles/vpa.html)
+    -   [VPAモデル診断スクリプト](https://ichimomo.github.io/frasyr/articles/Diagnostics-for-VPA.html)
 -   市野川桃子, 岡村寛(2014).
     VPAを用いた我が国水産資源評価の統計言語Rによる統一的検討
     (<a href="http://www.jsfo.jp/contents/pdf/78-2/78-2-104.pdf" class="uri">http://www.jsfo.jp/contents/pdf/78-2/78-2-104.pdf</a>)

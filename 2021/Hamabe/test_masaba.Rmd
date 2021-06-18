@@ -768,7 +768,7 @@ res_sensitivity$graph
 
 最近年の成熟率がSSBに与える影響が大きいのはある意味想定内です
 加入やバイオマス全体の動態が大きく変動していないので、この生物学的パラメータに対してある程度頑健であると言えます
-\\
+
 
 
 ## 4-5. ジャックナイフ法
@@ -881,10 +881,10 @@ res_boot$plot_cor
 一方、bについてはb2を除いては相関しているわけではないことも確認されました。
 
 
-# まとめ
 
 
-## 資料・参考文献
+# 資料・参考文献
+
 
 - 令和2年度(2020年度)資源管理研修
   - [VPA-01: frasyrを用いたVPA 概要編](https://www.youtube.com/watch?v=RSPX-SVMYog)
@@ -894,8 +894,8 @@ res_boot$plot_cor
   - [VPA-05: VPAのモデル診断 実践編](https://www.youtube.com/watch?v=JY6am-rNzPc)
 
 - frasyr内のスクリプト
-  - VPAについて(https://ichimomo.github.io/frasyr/articles/vpa.html)
-  - VPAのモデル診断について(https://ichimomo.github.io/frasyr/articles/Diagnostics-for-VPA.html)
+  - [VPA関数を使った資源量推定](https://ichimomo.github.io/frasyr/articles/vpa.html)
+  - [VPAモデル診断スクリプト](https://ichimomo.github.io/frasyr/articles/Diagnostics-for-VPA.html)
   
 - 市野川桃子, 岡村寛(2014). VPAを用いた我が国水産資源評価の統計言語Rによる統一的検討
 (http://www.jsfo.jp/contents/pdf/78-2/78-2-104.pdf)

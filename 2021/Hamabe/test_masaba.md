@@ -1122,17 +1122,18 @@ Mohnのrhoを見て頂いても明確ですが、Index3を抜くことで決し�
 
 ここで紹介するモデル診断手法は6つです
 
--   <font color="Gray">1. 残差プロット(済)</font>\\
--   <font color="Gray">2. レトロスペクティブ解析(済)</font>\\
--   1.  ジッター解析\\
+-   <font color="Gray">1. 残差プロット(済)</font>
 
--   1.  感度分析\\
+-   <font color="Gray">2. レトロスペクティブ解析(済)</font>
 
--   1.  ジャックナイフ法\\
+-   1.  ジッター解析
 
--   1.  ブートストラップ法\\
+-   1.  感度分析
 
-\\
+-   1.  ジャックナイフ法  
+
+-   1.  ブートストラップ法
+
 既に残差プロットとレトロスペクティブ解析については見てきたので、3番目のジッター解析からより詳細にモデルの妥当性を検討していきたいと思います
 
 4-3. ジッター解析
@@ -1187,8 +1188,6 @@ Mohnのrhoを見て頂いても明確ですが、Index3を抜くことで決し�
     ## replace the existing scale.
 
 ![](test_masaba_files/figure-markdown_strict/unnamed-chunk-26-3.png)
-
-\\
 
 4-4. 感度分析
 -------------
@@ -1261,8 +1260,7 @@ Index2がないと加入量や資源量が大きく推定されることが分�
 
 さて、Index3を除いた(×印)場合の結果についてです。このデータは残差の自己相関係数が有意でモデルの妥当性について疑問が残っていたところかと思います。
 さきほどの`res6.1`では、実際に取り除いて確認しましたが、ここでも同じことをしています。そしてこのデータを抜いても資源量推定の傾向などに大きな違いがないことがなく、その影響力は限定的だということが分かります。
-このデータの影響力が大きく、かつその残差に自己相関係数が有意に大きいという場合は、取り除く必要もあるかと思いますが、そうでない以上このデータを使っても問題はないと考えます。  
-\\
+このデータの影響力が大きく、かつその残差に自己相関係数が有意に大きいという場合は、このデータの妥当性について検証する必要がありますが、そうでない以上このデータを使っても問題はないと考えます。
 
 4-6. ブートストラップ法
 -----------------------
@@ -1281,9 +1279,9 @@ Index2がないと加入量や資源量が大きく推定されることが分�
 信頼区間のプロットは以下のようにすると資源量やSSB、加入量ごとにできるのですが、ここではpatchworkパッケージを使って、まとめてプロットしてみます。
 
     # とりあえずプロット
-    res_boot$plot_ssb+ggtitle("SSB")|
-      res_boot$plot_rec+ggtitle("加入量")|
-      res_boot$plot_biomass+ggtitle("資源量")
+    (res_boot$plot_ssb+ggtitle("SSB")) /
+      (res_boot$plot_rec+ggtitle("加入量")) /
+      (res_boot$plot_biomass+ggtitle("資源量"))
 
     ## Warning: Removed 1 row(s) containing missing values (geom_path).
 
@@ -1294,15 +1292,15 @@ Index2がないと加入量や資源量が大きく推定されることが分�
 ![](test_masaba_files/figure-markdown_strict/unnamed-chunk-32-1.png)
 
     # 2000年以降でプロット
-    res_boot$plot_ssb+ggtitle("SSB")+xlim(2000,2018) |
-      res_boot$plot_rec+ggtitle("加入量")+xlim(2000,2018) |
-      res_boot$plot_biomass+ggtitle("資源量")+xlim(2000,2018)
+    (res_boot$plot_ssb+ggtitle("SSB")+xlim(2010,2018)) /
+      (res_boot$plot_rec+ggtitle("加入量")+xlim(2010,2018)) /
+      (res_boot$plot_biomass+ggtitle("資源量")+xlim(2010,2018))
 
-    ## Warning: Removed 31 row(s) containing missing values (geom_path).
+    ## Warning: Removed 41 row(s) containing missing values (geom_path).
 
-    ## Warning: Removed 31 row(s) containing missing values (geom_path).
+    ## Warning: Removed 41 row(s) containing missing values (geom_path).
 
-    ## Warning: Removed 31 row(s) containing missing values (geom_path).
+    ## Warning: Removed 41 row(s) containing missing values (geom_path).
 
 ![](test_masaba_files/figure-markdown_strict/unnamed-chunk-32-2.png)
 
@@ -1322,7 +1320,7 @@ Index2がないと加入量や資源量が大きく推定されることが分�
 これをVPAについて置き換えると以下のようになります。
 
 -   考えたデータの不確実性：資源量指標値（台風の例だと気圧配置）
--   考えていないデータとそのの不確実性：年齢別漁獲尾数、年齢別体重、等々（台風の例だと海面水温）
+-   考えていないデータとその不確実性：年齢別漁獲尾数、年齢別体重、等々（台風の例だと海面水温）
 
 もちろん実際の台風の予測では海面水温等も使っているはずですが、イメージしやすいあくまで例です。
 
@@ -1331,6 +1329,52 @@ Index2がないと加入量や資源量が大きく推定されることが分�
 ### パラメータ間の相関
 
     res_boot$plot_cor
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
+
+    ## Warning in cor(x, y): 標準偏差が 0 です
 
     ## Warning in cor(x, y): 標準偏差が 0 です
 

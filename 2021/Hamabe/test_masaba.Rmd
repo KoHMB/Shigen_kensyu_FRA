@@ -14,7 +14,7 @@ setwd("C:/Users/00007920/Desktop/GitHub_repository/Shigen_kensyu_FRA/2021/Hamabe
 library(ggplot2)
 library(frasyr)
 library(patchwork)
-knitr::opts_chunk$set(echo = TRUE, fig.height = 15, fig.width = 14)
+knitr::opts_chunk$set(echo = TRUE, fig.height = 10, fig.width = 14)
 #knitr::opts_chunk$set(out.width="400px", dpi=120)
 
 ```
@@ -29,8 +29,7 @@ knitr::opts_chunk$set(echo = TRUE, fig.height = 15, fig.width = 14)
 - 実データに基づいていますが、あくまで研修の例題として考えてください
 
 
-
-# 準備
+## 準備
 
 
 ```{r, eval=FALSE}
@@ -104,6 +103,8 @@ plot_vpa(list(res1.1, res1.2))
 ```
 
 
+
+
 <font color="Red">**まずは最近年のFが推定できているかチェック**</font>
 
 - 最終年のFの推定が収束していない
@@ -125,7 +126,7 @@ plot_vpa(list(res1.1, res1.2))
 - 今、４つの資源量指標値があります
 - それぞれの資源量指標値の重み（信頼度のようなもの）を等しいとして計算します
 
-```{r}
+```{r, fig.height = 15, fig.width = 14}
 
 res2.1 <- vpa(dat=dat,
               tf.year = 2015:2017,
@@ -146,13 +147,17 @@ res2.1 <- vpa(dat=dat,
               plot.year = 2002:2018
               )
 res2.1$faa[,as.character(2013:2017)]
+
+```
+
+
+```{r}
 # プロットをしてみる
 plot_vpa(list(VPA = res1.1, tVPA = res2.1), 
          what.plot = c("SSB", "biomass", "U", "Recruitment",
                        "fish_number", "fishing_mortality"))
 
 ```
-
 
 ### モデル診断1: 残差プロット
 
@@ -189,7 +194,7 @@ retro2.1$graph
 
 特に2番目の残差の大きさの違いについては、最尤推定法という最適化手法を選ぶことで対処することができます。最尤推定法では1つ1つの**資源量指数の重みを分けて推定**することができます
 
-```{r}
+```{r, fig.height = 15, fig.width = 14}
 
 res3.1 <- vpa(dat=dat,
               tf.year = 2015:2017,
@@ -213,14 +218,17 @@ res3.1 <- vpa(dat=dat,
 # まずは年齢別漁獲尾数
 res3.1$faa[,as.character(2013:2017)]
 
+# 観測誤差（各データの重み）を見る
+res3.1$sigma
+
+```
+
+
+```{r}
 # 資源動態の比較
 plot_vpa(list(non = res1.1, ls = res2.1, ml = res3.1),
          what.plot = c("SSB", "biomass", "U", "Recruitment",
                        "fish_number", "fishing_mortality"))
-
-# 観測誤差（各データの重み）を見る
-res3.1$sigma
-
 ```
 
 
@@ -273,7 +281,7 @@ retro3.1$graph
 - 一方、親魚の指数は0.65程と加入指数に比べて小さめでした
 - それぞれの指数の重みを出しましたが、加入か親魚かで2分しても推定が可能では？
 
-```{r}
+```{r, fig.height = 15, fig.width = 14}
 
 res3.2 <- vpa(dat=dat,
               tf.year = 2015:2017,
@@ -306,13 +314,18 @@ data.frame(Model = c(3.1, 3.2),
            index4 = c(res3.1$sigma[4], res3.2$sigma[4])
            )
 
+```
+
+
+```{r}
+
 # 資源動態の比較
 plot_vpa(list(ls = res2.1, ml1 = res3.1, ml2 = res3.2),
          what.plot = c("SSB", "biomass", "U", "Recruitment",
                        "fish_number", "fishing_mortality"))
 
-
 ```
+
 
 ### モデル診断1: 残差プロット
 
@@ -372,7 +385,7 @@ data.frame(Model=c(2.1, 3.1, 3.2),
 
 VPA-07動画の宿題の答えです。試してみてください。
 
-```{r}
+```{r, fig.height = 15, fig.width = 14}
 
 res3.3 <- vpa(dat=dat,
               tf.year = 2015:2017,
@@ -410,7 +423,7 @@ $$I_t = qB_t^{b}$$
 
 したがって、この関数は比例の直線みたいになっています。
 
-```{r}
+```{r, fig.height = 15, fig.width = 14}
 
 res4.1 <- vpa(dat=dat,
               tf.year = 2015:2017,
@@ -435,6 +448,11 @@ res4.1$b
 
 res4.1$faa[,as.character(2013:2017)]
 
+```
+
+
+```{r}
+
 resid4.1 <- plot_residual_vpa(res4.1)
 resid4.1$abund_Index
 
@@ -453,7 +471,7 @@ resid4.1$abund_Index
   - index2については微妙なので、先程と同様にモデル選択で予測力を確認してみましょう
 
 
-```{r}
+```{r, fig.height = 15, fig.width = 14}
 
 # Index1以外のbの推定
 res4.2 <- vpa(dat=dat,
@@ -575,7 +593,7 @@ retro4.3$graph+xlim(2005,2018)+ggtitle("モデル4.3のレトロ解析")
 
 ## 2-4. 全F推定法
 
-```{r}
+```{r, fig.height = 15, fig.width = 14}
 
 res5.1 <- vpa(dat,
               tf.year = 2015:2017,
@@ -612,14 +630,14 @@ res5.1$faa[,as.character(2013:2017)]
 ## Index3を取り除いてみる
 
 結局、Index3の自己相関係数は有意なままでした。
-ただモデル診断というのは明確な良し悪しの線引きを示すものではありません。
+ただモデル診断というのは**明確な良し悪しの線引きを示すものではありません。**
 もちろん、自己相関係数が有意だからこの結果は信用できないという人もいるかもしれませんが、
 また異なるモデル診断を通して、Index3はそれほど影響が大きくないんだということを示すことも一つの手です。
 
 あとでジャックナイフ法でもやりますが、試しにIndex3を抜いてみましょう
 こうすることで、残差に自己相関のないデータだけで資源評価を行ったという、妥当性を示すことができます。
 
-```{r}
+```{r, fig.height = 15, fig.width = 14}
 
 res6.1 <- vpa(dat=dat,
               tf.year = 2015:2017,
@@ -642,16 +660,22 @@ res6.1 <- vpa(dat=dat,
               plot = TRUE,
               plot.year = 2002:2018
               )
+```
+
+
+```{r}
 
 plot_vpa(list(res4.3=res4.3, res6.1=res6.1),
          what.plot = c("SSB", "biomass", "U", "Recruitment",
                        "fish_number", "fishing_mortality"))
 
+
 ```
+
 
 残差プロットやCPUEへのフィッティングを見る限り、決して悪くはありません。
 自己相関係数そのもの値も低く、フィットはいいかと思います。
-ただそれでも、この例では加入の指標値であるIndex1やIndex2のフィットが良くないというのは、モデルの特性でもあります。
+。
 
 ### モデル診断2: レトロスペクティブ解析
 
@@ -664,7 +688,7 @@ retro6.1$graph
 
 Mohnのrhoを見て頂いても明確ですが、Index3を抜くことで決してレトロバイアスが減るわけではありません。
 推定精度が良くなるわけでもないですし、データを抜くというのは恣意的な作業の一つでもあります。
-（データが不完全、あるいは標準化されていない等の情報がない限り）
+（データが不完全、あるいは標準化されていない等でない限り）
 したがって、これまで通り4本の資源量指標値の結果を用いて、今後のモデル診断も進めていきたいと思います。
 
 
@@ -705,12 +729,16 @@ plot_vpa(list(non_tVPA = res1.1, tVPA_ls = res2.1, tVPA_ml = res3.2, tVPA_ml_b =
 
 ここで紹介するモデル診断手法は6つです
 
-- <font color="Gray">1. 残差プロット(済)</font>
-- <font color="Gray">2. レトロスペクティブ解析(済)</font>
+
+<font color="Gray">
+- 1. 残差プロット(済)
+- 2. レトロスペクティブ解析(済)
+</font>
+
 
 - 3. ジッター解析
 - 4. 感度分析
-- 5. ジャックナイフ法\
+- 5. ジャックナイフ法
 - 6. ブートストラップ法
 
 
@@ -865,7 +893,7 @@ res_boot <- readRDS("res_boot.RDS")
 
 ### パラメータ間の相関
 
-```{r}
+```{r, warning=FALSE}
 
 res_boot$plot_cor
 

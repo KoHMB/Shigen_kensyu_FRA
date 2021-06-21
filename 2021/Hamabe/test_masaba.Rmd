@@ -922,7 +922,7 @@ res_boot$plot_cor
   - [VPA-05: VPAのモデル診断 実践編](https://www.youtube.com/watch?v=JY6am-rNzPc)
 
 - frasyr内のスクリプト
-  - [VPA関数を使った資源量推定](https://ichimomo.github.io/frasyr/articles/vpa.html)
+  - [VPA関数を使った資源量推定](https://ichim %>% omo.github.io/frasyr/articles/vpa.html)
   - [VPAモデル診断スクリプト](https://ichimomo.github.io/frasyr/articles/Diagnostics-for-VPA.html)
   
 - 市野川桃子, 岡村寛(2014). VPAを用いた我が国水産資源評価の統計言語Rによる統一的検討

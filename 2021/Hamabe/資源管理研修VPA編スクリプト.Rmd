@@ -1,0 +1,944 @@
+---
+title: "実データを用いたfrasyrによるVPAの実践"
+subtitle: "2021年度資源管理研修スクリプト"
+author: "濵邉昂平（漁業情報解析部資源解析グループ）"
+date: "2021/7/1"
+output:
+   md_document:
+    toc: true
+    toc_depth: 3  
+---
+
+```{r setup, include=FALSE}
+setwd("C:/Users/00007920/Desktop/GitHub_repository/Shigen_kensyu_FRA/2021/Hamabe")
+library(ggplot2)
+library(frasyr)
+library(patchwork)
+knitr::opts_chunk$set(echo = TRUE, fig.height = 10, fig.width = 14)
+#knitr::opts_chunk$set(out.width="400px", dpi=120)
+
+```
+
+
+# はじめに
+
+- 実際にある資源のデータを使ってVPA計算とモデル診断を模擬的に行います
+- 資源管理研修用に少し調整したデータとなっています
+- **本研修はフィクションで、実際の資源評価とは関係ありません**
+- データについてモデル診断を通してコメントするシーンがありますが、これは実際の資源評価のデータに対してのものと異なります
+- 実データに基づいていますが、あくまで研修の例題として考えてください
+  
+それでは、始めます  
+  
+
+
+# 0. 準備
+
+
+まずは以下のようにして`frasyr`を呼び出します。
+
+```{r, eval=FALSE}
+
+library(frasyr)
+
+```
+
+
+もし`frasyr`をインストールされていない場合は、[こちら](https://github.com/ichimomo/frasyr)のサイトを参考にインストールを試みてください
+
+
+
+
+```{r}
+
+caa  <- read.csv("data/caa0_2020.csv", row.names = 1)
+waa  <- read.csv("data/waa1_2020.csv", row.names = 1)
+maa  <- read.csv("data/maa2_2020.csv", row.names = 1)
+cpue <- read.csv("data/cpue2_aicc2020.csv", row.names = 1)
+dat  <- data.handler(caa, waa, maa, cpue, M=0.4)
+dat$index[1:2,"2018"] <- NA 
+
+# 資源量指数のプロット
+cpue2 <- cpue
+cpue2[1,] <- (cpue[1,]-mean(as.numeric(cpue[1,]), na.rm=TRUE))/
+  sd(as.numeric(cpue[1,]), na.rm=TRUE)
+cpue2[2,] <- (cpue[2,]-mean(as.numeric(cpue[2,]), na.rm=TRUE))/
+  sd(as.numeric(cpue[2,]), na.rm=TRUE)
+cpue2[3,] <- (cpue[3,]-mean(as.numeric(cpue[3,]), na.rm=TRUE))/
+  sd(as.numeric(cpue[3,]), na.rm=TRUE)
+cpue2[4,] <- (cpue[4,]-mean(as.numeric(cpue[4,]), na.rm=TRUE))/
+  sd(as.numeric(cpue[4,]), na.rm=TRUE)
+matplot(1970:2018,t(cpue2), type = "l", xlim = c(2000,2018),
+        ylab = "基準化CPUE")
+legend("topleft", legend = c("index1","index2","index3","index4"),
+       col = 1:4, lty=1:4, ncol=2)
+ 
+```
+
+資源量指数は全体として増加傾向にあるみたいです。
+特に、加入の指数であるIndex1とIndex2は2013年に大きな値を取っています。  
+
+
+# 1. チューニング無VPA
+
+
+VPAは年齢別漁獲尾数データから資源量計算が可能な解析手法です。
+まずは年齢別漁獲尾数データだけで資源計算をしていきたいと思います
+
+```{r}
+
+res1.1 <- vpa(dat=dat,
+              tf.year = 2015:2017,
+              plus.group = TRUE,
+              Pope = TRUE,
+              tune = FALSE,
+              p.init = 0.5
+              )
+res1.1$faa[,as.character(2013:2017)]
+
+# 最終年のFの平均年数を変えてみる
+res1.2 <- vpa(dat=dat,
+              tf.year = 2013:2017,
+              plus.group = TRUE,
+              Pope = TRUE,
+              tune = FALSE,
+              p.init = 0.5
+              )
+res1.2$faa[,as.character(2013:2017)]
+
+# プロットをしてみる
+plot_vpa(list(res1.1, res1.2))
+
+```
+
+
+
+
+<font color="Red">**まずは最近年のFが推定できているかチェック**</font>
+
+- 最終年のFの推定が収束していない
+- 漁獲量データから資源動態を推定するのは難しい...
+- ならば最近年の情報を足して、もう少しデータに基づいた資源評価をしてみよう
+- ちょうどいいところに**CPUE**があるぞ!
+
+
+
+# 2. チューニングVPA
+
+VPAは最近年の推定値の不確実性が大きいという特性を持っています.  
+そこで、資源量指標値のトレンドにフィットさせることで、更に情報の持った資源量推定ができます.  
+これをチューニングVPAといい、チューニングVPAには最適化手法や推定するFの対象に応じて様々な仕様があります.  
+
+## 2-1．最小二乗法推定
+
+- 今、４つの資源量指標値があります
+- それぞれの資源量指標値の重み（信頼度のようなもの）を等しいとして計算します
+
+```{r, fig.height = 15, fig.width = 14}
+
+res2.1 <- vpa(dat=dat,
+              tf.year = 2015:2017,
+              plus.group = TRUE,
+              last.catch.zero = TRUE,
+              Pope = TRUE,
+              tune = TRUE, #チューニングをする場合はTRUE
+              alpha = 1, #最高齢のFと(最高齢-1)歳のFの比
+              sel.update = TRUE,
+                         #選択率更新法(最終年最高齢をターミナルFにする場合はTRUEに)
+              est.method = "ls", #最適化手法は最小二乗法
+              term.F = "max", #推定する最終年のFは最高齢のFを一つ推定
+              abund = c("N","N","SSB","SSB"), #資源量指標値が何に対応しているか
+              min.age = c(0,0,0,0), #資源量指標値が対応している年齢の下限
+              max.age = c(0,0,6,6), #資源量指標値が対応している年齢の上限
+              use.index = 1:4, #どの資源量指標値を使うか
+              plot = TRUE,
+              plot.year = 2002:2018
+              )
+res2.1$faa[,as.character(2013:2017)]
+
+```
+
+
+```{r}
+# プロットをしてみる
+plot_vpa(list(VPA = res1.1, tVPA = res2.1), 
+         what.plot = c("SSB", "biomass", "U", "Recruitment",
+                       "fish_number", "fishing_mortality"))
+
+```
+
+### モデル診断1: 残差プロット
+
+```{r}
+
+resid2.1 <- plot_residual_vpa(res2.1, plot_year = 2000:2018)
+resid2.1$year_resid
+resid2.1$fitting_Index
+resid2.1$abund_Index
+
+```
+
+
+### モデル診断2: レトロスペクティブ解析
+
+```{r}
+
+retro2.1 <- do_retrospective_vpa(res2.1)
+retro2.1$graph
+
+```
+
+
+- 資源量指標値の情報を加えることで、先程までと異なりFの推定が安定したように見えます
+- ただし、最近SSBが本当に増えているのでしょうか?
+- 確認するにはいろんな方法がありますが、まずは自分でできること、データの扱い方でもう少し検討していきたいと思います
+
+
+## 2-2．最尤推定法
+
+- 先程の最小二乗法の残差プロットを見ます
+- 加入の指標を表すindex1とindex2に対して、親魚の指標であるindex3とindex4は残差が小さく見えます
+- また、残差には時系列に対して独立であるという仮定がありますが、index2やindex4は最近の残差が大きく見えます
+
+特に2番目の残差の大きさの違いについては、最尤推定法という最適化手法を選ぶことで対処することができます。最尤推定法では1つ1つの**資源量指数の重みを分けて推定**することができます
+
+```{r, fig.height = 15, fig.width = 14}
+
+res3.1 <- vpa(dat=dat,
+              tf.year = 2015:2017,
+              plus.group = TRUE,
+              last.catch.zero = TRUE,
+              Pope = TRUE,
+              tune = TRUE,
+              alpha = 1,
+              sel.update = TRUE,
+              est.method = "ml", #最適化手法を最尤推定法に
+              term.F = "max",
+              abund = c("N","N","SSB","SSB"),
+              min.age = c(0,0,0,0),
+              max.age = c(0,0,6,6),
+              use.index = 1:4,
+              sigma.constraint = c(1,2,3,4),
+              plot = TRUE,
+              plot.year = 2002:2018
+              )
+
+# まずは年齢別漁獲尾数
+res3.1$faa[,as.character(2013:2017)]
+
+# 観測誤差（各データの重み）を見る
+res3.1$sigma
+
+```
+
+
+```{r}
+# 資源動態の比較
+plot_vpa(list(non = res1.1, ls = res2.1, ml = res3.1),
+         what.plot = c("SSB", "biomass", "U", "Recruitment",
+                       "fish_number", "fishing_mortality"))
+```
+
+
+### モデル診断1: 残差プロット
+
+- 残差プロットを比較してみよう
+
+**patchworkパッケージが必要です!!**
+
+```{r}
+
+#install.packages("patchwork")  # パッケージのインストール
+#install.packages("ggplot2")  
+library(patchwork)             # パッケージの読み込み
+library(ggplot2)  
+
+resid3.1 <- plot_residual_vpa(res3.1, plot_year = 2000:2018)
+
+# 残差の時系列プロット
+resid2.1$year_resid+ggtitle("最小二乗法") | resid3.1$year_resid+ggtitle("最尤推定法")
+
+# 資源量とのフィッティング
+resid2.1$fitting_Index+ggtitle("最小二乗法") | resid3.1$fitting_Index+ggtitle("最尤推定法")
+
+# 資源量と指数の線形関係
+resid2.1$abund_Index+ggtitle("最小二乗法") |resid3.1$abund_Index+ggtitle("最尤推定法")
+
+```
+
+
+### モデル診断2: レトロスペクティブ解析
+
+```{r}
+
+retro3.1 <- do_retrospective_vpa(res3.1)
+retro3.1$graph
+
+```
+
+- Mohn's rhoが大きくなっちゃった
+- これは最尤法はデータごとに重み付けを出来る反面、データにオーバーフィットする傾向があることが要因の一つであると言える
+- 2012年までは加入の指数は軒並み横ばいだったけど、SSBの指数は2008年頃から増加傾向にありました
+-このデータトレンドを説明するためにFを大きくしてモデルをフィットさせてしまったと考えられます
+- 最小二乗法では加入と親魚の指数の重みを等しくしていたので、SSBの指数の傾向にフィットしすぎるということが見られず、結果としてレトロスペクティブ解析が安定しているといえます
+
+
+### 重みを少しまとめた解析
+
+- 加入の指数の観測誤差は1.2以上と大きめでした
+- 一方、親魚の指数は0.65程と加入指数に比べて小さめでした
+- それぞれの指数の重みを出しましたが、加入か親魚かで2分しても推定が可能では？
+
+```{r, fig.height = 15, fig.width = 14}
+
+res3.2 <- vpa(dat=dat,
+              tf.year = 2015:2017,
+              plus.group = TRUE,
+              last.catch.zero = TRUE,
+              Pope = TRUE,
+              tune = TRUE,
+              alpha = 1,
+              sel.update = TRUE,
+              est.method = "ml",
+              term.F = "max",
+              abund = c("N","N","SSB","SSB"),
+              min.age = c(0,0,0,0),
+              max.age = c(0,0,6,6),
+              use.index = 1:4,
+              sigma.constraint = c(1,1,2,2),
+              plot = TRUE,
+              plot.year = 2002:2018
+              )
+
+# まずは年齢別漁獲尾数
+res3.2$faa[,as.character(2013:2017)]
+
+
+# 重みの比較
+data.frame(Model = c(3.1, 3.2),
+           index1 = c(res3.1$sigma[1], res3.2$sigma[1]),
+           index2 = c(res3.1$sigma[2], res3.2$sigma[2]),
+           index3 = c(res3.1$sigma[3], res3.2$sigma[3]),
+           index4 = c(res3.1$sigma[4], res3.2$sigma[4])
+           )
+
+```
+
+
+```{r}
+
+# 資源動態の比較
+plot_vpa(list(ls = res2.1, ml1 = res3.1, ml2 = res3.2),
+         what.plot = c("SSB", "biomass", "U", "Recruitment",
+                       "fish_number", "fishing_mortality"))
+
+```
+
+
+### モデル診断1: 残差プロット
+
+**patchworkパッケージが必要です!!**
+
+```{r}
+
+resid3.2 <- plot_residual_vpa(res3.2, plot_year = 2000:2018)
+
+# 残差の時系列プロット
+resid3.1$year_resid|resid3.2$year_resid
+
+# 資源量とのフィッティング
+resid3.1$fitting_Index|resid3.2$fitting_Index
+
+
+```
+
+- それほど大きな違いは見られない
+- 重みを共有したことでindex4はより残差が
+
+### モデル診断2: レトロスペクティブ解析
+
+
+```{r}
+
+retro3.2 <- do_retrospective_vpa(res3.2)
+retro3.2$graph
+
+```
+
+- やはりFのレトロの結果が収束していない
+- 資源量についても過小推定のレトロバイアスが見られる
+- **最小二乗法の方がレトロバイアスが少なく予測能力が高いのか**
+
+
+### モデル選択
+
+AICという指標を用います。AICが小さい方が予測力のあるモデルと言えます。より小さいAICからの差を取ったものをデルタAICと言い、それをお示しします。
+
+```{r}
+
+aic2.1 <- -2*res2.1$logLik+2
+aic3.1 <- -2*res3.1$logLik+2*4
+aic3.2 <- -2*res3.2$logLik+2*2
+
+data.frame(Model=c(2.1, 3.1, 3.2),
+           AIC = c(aic2.1-min(c(aic2.1,aic3.1, aic3.2)),
+                   aic3.1-min(c(aic2.1,aic3.1, aic3.2)),
+                   aic3.2-min(c(aic2.1,aic3.1, aic3.2))))
+
+```
+
+- AICでも同様の傾向が見られた
+- 観測誤差が等分散、つまり指標値の重みは等しいモデルは良くないことが支持されました
+
+### 観測誤差がデータ間で等分散の最尤推定法(=最小二乗法)
+
+VPA-07動画の宿題の答えです。試してみてください。
+
+```{r, fig.height = 15, fig.width = 14}
+
+res3.3 <- vpa(dat=dat,
+              tf.year = 2015:2017,
+              plus.group = TRUE,
+              last.catch.zero = TRUE,
+              Pope = TRUE,
+              tune = TRUE,
+              alpha = 1,
+              sel.update = TRUE,
+              est.method = "ml",
+              term.F = "max",
+              abund = c("N","N","SSB","SSB"),
+              min.age = c(0,0,0,0),
+              max.age = c(0,0,6,6),
+              use.index = 1:4,
+              sigma.constraint = c(1,1,1,1), # 最小二乗法の意味です
+              plot = TRUE,
+              plot.year = 2002:2018
+              )
+
+res3.3$faa[,as.character(2013:2017)]
+res2.1$faa[,as.character(2013:2017)]
+
+
+```
+
+
+## 2-3. bの考慮
+
+- 目を凝らして残差プロットを見てみますと、資源量と資源量指数の線形性に疑問を感じ始めました
+
+$$I_t = qB_t^{b}$$
+
+という関係があって、普段は$b=1$です。
+
+したがって、この関数は比例の直線みたいになっています。
+
+```{r, fig.height = 15, fig.width = 14}
+
+res4.1 <- vpa(dat=dat,
+              tf.year = 2015:2017,
+              plus.group = TRUE,
+              last.catch.zero = TRUE,
+              Pope = TRUE,
+              tune = TRUE,
+              alpha = 1,
+              sel.update = TRUE,
+              est.method = "ml",
+              term.F = "max",
+              abund = c("N","N","SSB","SSB"),
+              min.age = c(0,0,0,0),
+              max.age = c(0,0,6,6),
+              use.index = 1:4,
+              sigma.constraint = c(1,1,2,2),
+              b.est = TRUE, # bを推定するにはここをTRUEにする
+              plot = TRUE,
+              plot.year = 2002:2018
+              )
+res4.1$b
+
+res4.1$faa[,as.character(2013:2017)]
+
+```
+
+
+```{r}
+
+resid4.1 <- plot_residual_vpa(res4.1)
+resid4.1$abund_Index
+
+```
+
+- 親魚の指数のbは1から大きく離れた値が推定されました
+- これはすなわち、実際に海にたくさん親魚がいても、その指数（ここではたもすくいと産卵量）は比例せず、ある程度以上の親魚数になると、これらの指標は頭打ちになるということです
+  - データからもこういった特性が見えてくるのは面白いですね
+  - これらのデータは資源が高位な時期には感度が悪い（逆に低位な時期には感度がいい）とも言いえます
+  - 良い悪いではなく!（決してデータそのものを批判するものではありません）
+
+- 年齢別漁獲係数を見てみても、2013年最高齢の極端なFが少し落ち着いた印象を受けます
+
+- bについても重みのパラメータと同様に、必要な分だけ推定するといったことができます
+  - 試しに親魚指数だけb推定をするといったことをしてみましょう
+  - index2については微妙なので、先程と同様にモデル選択で予測力を確認してみましょう
+
+
+```{r, fig.height = 15, fig.width = 14}
+
+# Index1以外のbの推定
+res4.2 <- vpa(dat=dat,
+              tf.year = 2015:2017,
+              plus.group = TRUE,
+              last.catch.zero = TRUE,
+              Pope = TRUE,
+              tune = TRUE,
+              alpha = 1,
+              sel.update = TRUE,
+              est.method = "ml",
+              term.F = "max",
+              abund = c("N","N","SSB","SSB"),
+              min.age = c(0,0,0,0),
+              max.age = c(0,0,6,6),
+              use.index = 1:4,
+              sigma.constraint = c(1,1,2,2),
+              b.est = TRUE,
+              b.fix = c(1,NA,NA,NA),
+              plot = TRUE,
+              plot.year = 2002:2018
+              )
+res4.2$faa[,as.character(2013:2017)]
+
+# 親魚指数のみb推定
+res4.3 <- vpa(dat=dat,
+              tf.year = 2015:2017,
+              plus.group = TRUE,
+              last.catch.zero = TRUE,
+              Pope = TRUE,
+              tune = TRUE,
+              alpha = 1,
+              sel.update = TRUE,
+              est.method = "ml",
+              term.F = "max",
+              abund = c("N","N","SSB","SSB"),
+              min.age = c(0,0,0,0),
+              max.age = c(0,0,6,6),
+              use.index = 1:4,
+              sigma.constraint = c(1,1,2,2),
+              b.est = TRUE,
+              b.fix = c(1,1,NA,NA),
+              plot = TRUE,
+              plot.year = 2002:2018
+              )
+res4.3$faa[,as.character(2013:2017)]
+
+# bの値の比較
+data.frame(Model = c(4.1, 4.2, 4.3),
+           index1 = c(res4.1$b[1], res4.2$b[1], res4.3$b[1]),
+           index2 = c(res4.1$b[2], res4.2$b[2], res4.3$b[2]),
+           index3 = c(res4.1$b[3], res4.2$b[3], res4.3$b[3]),
+           index4 = c(res4.1$b[4], res4.2$b[4], res4.3$b[4])
+           )
+
+```
+
+
+```{r}
+
+aic3.2 <- -2*res3.2$logLik
+aic4.1 <- -2*res4.1$logLik+2*4  # 4つののbを推定しました
+aic4.2 <- -2*res4.2$logLik+2*3  # Index1を除く3つのbを推定しました
+aic4.3 <- -2*res4.3$logLik+2*2  # Index1と2を除く2つのbを推定しました
+
+data.frame(Model=c(3.2, 4.1, 4.2, 4.3),
+           deltaAIC = c(aic3.2-min(c(aic3.2, aic4.1, aic4.2, aic4.3)),
+                        aic4.1-min(c(aic3.2, aic4.1, aic4.2, aic4.3)),
+                        aic4.2-min(c(aic3.2, aic4.1, aic4.2, aic4.3)),
+                        aic4.3-min(c(aic3.2, aic4.1, aic4.2, aic4.3))))
+
+```
+
+ **bはIndex1以外で推定するモデルが、一番予測能力があるという結果になりました**
+ 
+
+**モデル診断も忘れてはいけません!!**
+
+### モデル診断1: 残差プロット
+
+```{r}
+
+resid4.3 <- plot_residual_vpa(res4.3, plot_year = 2000:2018)
+
+# 残差の時系列プロット
+resid4.3$year_resid+ggtitle("res4.3") | resid3.2$year_resid+ggtitle("res3.2")
+
+# 資源量とのフィッティング
+resid4.3$fitting_Index+ggtitle("res4.3") | resid3.2$fitting_Index+ggtitle("res3.2")
+
+# 資源量と資源量指数の関係
+resid4.3$abund_Index+ggtitle("res4.3") | resid3.2$abund_Index+ggtitle("res3.2")
+
+```
+
+
+### モデル診断2: レトロスペクティブ解析
+
+```{r}
+
+retro4.3 <- do_retrospective_vpa(res4.3)
+retro4.3$graph
+
+```
+
+- まだバイオマスに過小推定のレトロバイアスが見られる
+- 前のモデルよりMohn's rhoは小さくなってきている
+
+
+## ggplot小話
+
+```{r}
+
+retro4.3$graph+xlim(2005,2018)
+retro4.3$graph+xlim(2005,2018)+ggtitle("モデル4.3のレトロ解析")
+
+```
+
+
+## 2-4. 全F推定法
+
+```{r, fig.height = 15, fig.width = 14}
+
+res5.1 <- vpa(dat,
+              tf.year = 2015:2017,
+            tune = TRUE,
+            term.F = "all",
+            alpha = 1,
+            abund = c("N","N","SSB","SSB"),
+            min.age = c(0,0,0,0),
+            max.age = c(0,0,6,6),
+            est.method="ml", #重み推定（最尤法）
+            b.est = TRUE, #b推定
+            sel.def="max",
+            #b.fix = c(1,1,NA,NA),
+            last.catch.zero=TRUE,
+            fc.year=2016:2018,
+            plot = TRUE,
+            plot.year = 2002:2018,
+            use.index =1:4,
+            sigma.constraint = c(1,1,2,2)
+)
+
+res5.1$faa[,as.character(2013:2017)]
+
+
+```
+
+- 残差プロットの自己相関係数の有意*がなくなり一見よく見える
+- けれども**Fの値は発散**している
+- これは最終年のFを自由に動かして**データにオーバーフィット**してしまった
+- 先述の通り、VPAは最終年のFでしか個体群動態の挙動を動かすことができないから
+- 特にこのデータでは最近年のFが増加傾向にあるので、Fの推定も発散気味になってしまう
+- このFの収束と資源量指標値のフィットを改善したものが**リッジVPA**と呼ばれる手法
+
+## Index3を取り除いてみる
+
+結局、Index3の自己相関係数は有意なままでした。
+ただモデル診断というのは**明確な良し悪しの線引きを示すものではありません。**
+もちろん、自己相関係数が有意だからこの結果は信用できないという人もいるかもしれませんが、
+また異なるモデル診断を通して、Index3はそれほど影響が大きくないんだということを示すことも一つの手です。
+
+あとでジャックナイフ法でもやりますが、試しにIndex3を抜いてみましょう
+こうすることで、残差に自己相関のないデータだけで資源評価を行ったという、妥当性を示すことができます。
+
+```{r, fig.height = 15, fig.width = 14}
+
+res6.1 <- vpa(dat=dat,
+              tf.year = 2015:2017,
+              plus.group = TRUE,
+              last.catch.zero = TRUE,
+              Pope = TRUE,
+              tune = TRUE,
+              alpha = 1,
+              sel.update = TRUE,
+              est.method = "ml",
+              term.F = "max",
+              abund = c("N","N","SSB","SSB"),
+              min.age = c(0,0,0,0),
+              max.age = c(0,0,6,6),
+              use.index = c(1,2,4),
+              sigma.constraint = c(1,1,2,2),
+              b.est = TRUE,
+              b.fix = c(1,NA,NA),
+              p.init = res4.3$term.f,
+              plot = TRUE,
+              plot.year = 2002:2018
+              )
+```
+
+
+```{r}
+
+plot_vpa(list(res4.3=res4.3, res6.1=res6.1),
+         what.plot = c("SSB", "biomass", "U", "Recruitment",
+                       "fish_number", "fishing_mortality"))
+
+
+```
+
+
+残差プロットやCPUEへのフィッティングを見る限り、決して悪くはありません。
+自己相関係数そのもの値も低く、フィットはいいかと思います。
+。
+
+### モデル診断2: レトロスペクティブ解析
+
+```{r}
+
+retro6.1 <- do_retrospective_vpa(res6.1)
+retro6.1$graph
+
+```
+
+Mohnのrhoを見て頂いても明確ですが、Index3を抜くことで決してレトロバイアスが減るわけではありません。
+推定精度が良くなるわけでもないですし、データを抜くというのは恣意的な作業の一つでもあります。
+（データが不完全、あるいは標準化されていない等でない限り）
+したがって、これまで通り4本の資源量指標値の結果を用いて、今後のモデル診断も進めていきたいと思います。
+
+
+
+# 3. VPA計算結果まとめ
+
+
+```{r}
+
+plot_vpa(list(non_tVPA = res1.1, tVPA_ls = res2.1, tVPA_ml = res3.2, tVPA_ml_b = res4.3), 
+         what.plot = c("SSB", "biomass", "U", "Recruitment",
+                       "fish_number", "fishing_mortality"))
+
+```
+
+この後、詳細なモデル診断を進めていきますが、その前に一つベースモデルを決めておきたいと思います。
+
+ここまでの流れに従って、ここでは`res4.3`をベースモデルとしてその妥当性をより評価していきたいと思います。
+
+
+
+**`res4.3`**
+
+- チューニング : 資源量指標値4つ
+- ターミナルF : 最終年最高齢F
+- 選択率更新法 : あり
+- 最適化手法 : 最尤推定法
+- 観測誤差 : Index1&2, Index3&4で2つ推定
+- b : Index3、4について推定
+
+
+
+# 4. VPAのモデル診断
+
+
+
+先程、ベースモデルと定めた`res4.3`に対してモデル診断を行っていきます。
+
+ここで紹介するモデル診断手法は6つです
+
+
+<font color="gray">
+
+- 1. 残差プロット(済)
+- 2. レトロスペクティブ解析(済)
+
+</font>
+
+
+- 3. ジッター解析
+- 4. 感度分析
+- 5. ジャックナイフ法
+- 6. ブートストラップ法
+
+
+既に残差プロットとレトロスペクティブ解析については見てきたので、3番目のジッター解析からより詳細にモデルの妥当性を検討していきたいと思います
+
+## 4-3. ジッター解析
+
+
+```{r}
+
+res_jitter <- do_estcheck_vpa(res4.3, n_ite=10)
+
+```
+
+```{r}
+
+res_jitter$graph$likelihood+geom_vline(aes(xintercept=res4.3$input$p.init), linetype=2)
+
+res_jitter$graph$estimated
+res_jitter$graph$estimated+ylim(0,NA)
+
+```
+
+
+
+
+## 4-4. 感度分析
+
+- VPAで仮定している様々な仮定に対して、値を変えた場合に資源推定結果などにどのような影響を与えるか確認します
+- どの値を感度分析の対象にするかで、関数中の引数が変わります
+- どの値を対象にするかは資源によって変わります
+
+### 成熟率
+
+- `sensitive.maa1`: 2016-2018年までの成熟率が2015年の成熟率と同じという仮定
+- `sensitive.maa2`: 2015-2018年までの成熟率が2014年の成熟率と同じという仮定
+
+以上の2通りについて感度分析してみます
+
+```{r}
+
+sensitive.maa1 <- sensitive.maa2 <- dat$maa
+sensitive.maa1[4, 47:49] <- 1
+sensitive.maa2[, 46:49] <- dat$maa[,45]
+
+res_sensitivity <- do_sensitivity_vpa(res4.3, what_replace = "maa", 
+                                      value =list(sensitive.maa1,
+                                                  sensitive.maa2),                                          what_plot=c("SSB","biomass","U","Recruitment",
+                                      "fish_number","fishing_mortality"), 
+                                          ncol=3
+                                          )
+res_sensitivity$graph
+
+```
+
+最近年の成熟率がSSBに与える影響が大きいのはある意味想定内です
+加入やバイオマス全体の動態が大きく変動していないので、この生物学的パラメータに対してある程度頑健であると言えます
+
+
+
+## 4-5. ジャックナイフ法
+
+データ（資源量指標値）を1本ずつ取り除いて推定結果がどれだけ変動するか見る診断手法です。
+これによってデータの影響力や外れ値が資源量推定結果に与える影響を見ることができます
+
+```{r}
+
+res_jackknife <- do_jackknife_vpa(res4.3,
+                                  what_plot=c("SSB","biomass","U","Recruitment",
+                                              "fish_number","fishing_mortality"),
+                                  ncol = 3,
+                                  plot_year = 2000:2018)
+res_jackknife$JKplot_vpa
+res_jackknife$JKplot_par
+
+```
+
+Index2がないと加入量や資源量が大きく推定されることが分かります。
+その次にIndex1はの影響が大きく見えます。
+いずれも加入の指標ですが、これは2013年の大きな値へフィットしにくくなる、2013年の加入尾数が低く推定される。結果として最近年の資源尾数が低くなるというこ戸田と考えます
+
+```{r, echo=FALSE}
+resid4.3$fitting_Index
+```
+
+
+さて、Index3を除いた(×印)場合の結果についてです。このデータは残差の自己相関係数が有意でモデルの妥当性について疑問が残っていたところかと思います。
+さきほどの`res6.1`では、実際に取り除いて確認しましたが、ここでも同じことをしています。そしてこのデータを抜いても資源量推定の傾向などに大きな違いがないことがなく、その影響力は限定的だということが分かります。
+このデータの影響力が大きく、かつその残差に自己相関係数が有意に大きいという場合は、このデータの妥当性について検証する必要がありますが、そうでない以上このデータを使っても問題はないと考えます。  
+
+
+
+## 4-6. ブートストラップ法
+
+
+```{r, eval=FALSE}
+
+res_boot <- plot_resboot_vpa(res4.3, B_ite = 100)
+
+```
+
+100回繰り返し計算するので結構時間がかかります。
+
+```{r, echo=FALSE}
+res_boot <- readRDS("res_boot.RDS")
+```
+
+
+### 信頼区間の計算
+
+100回分のVPA計算があるので、ここから信頼区間を計算することができます。
+信頼区間のプロットは以下のようにすると資源量やSSB、加入量ごとにできるのですが、ここではpatchworkパッケージを使って、まとめてプロットしてみます。
+
+```{r}
+
+# とりあえずプロット
+(res_boot$plot_ssb+ggtitle("SSB")) /
+  (res_boot$plot_rec+ggtitle("加入量")) /
+  (res_boot$plot_biomass+ggtitle("資源量"))
+
+# 2000年以降でプロット
+(res_boot$plot_ssb+ggtitle("SSB")+xlim(2010,2018)) /
+  (res_boot$plot_rec+ggtitle("加入量")+xlim(2010,2018)) /
+  (res_boot$plot_biomass+ggtitle("資源量")+xlim(2010,2018))
+
+```
+
+
+#### VPAで考えられる不確実性の限界
+
+これまでにVPAは最終年のFでしか資源量推定結果をコントロールできないと話してきたかと思います。これは最終年のFが求まると、そこから遡って計算される過去の資源量はモデルの式通りに計算され、10年もすれば資源量指標値によるチューニングの効果もほとんどなくなってしまいます。
+
+最近年の資源量推定結果がFの推定法や最適化手法で大きく異なると議論をしてきましたが、これらは十分に信頼区間の範囲の中です。それだけ**最近年のこの資源の推定結果は不確実さが高いことをこれまでの解析でも感じてきましたし、なによりこのブートストラップ法というモデル診断が示している**ことになります。
+
+
+#### 過去の不確実性は決して小さくない
+
+そしてもう一つ、過去の信頼区間が非常に狭いですが、これは過去の推定精度が高いことを意味しているわけではありません。VPAというモデルの仮定の基ではこうなる他ないだけです。特に、海外の資源評価などでは今年の資源量と去年の資源量との変動に、確率的な誤差（過程誤差と言います）を加えていたり、あるいは年齢別漁獲尾数についても誤差を考えていたりします。
+
+**これらのデータに不確実性がないとしたモデル**があくまで**VPA**ですが、現実にはこのような誤差はあるものです。
+
+例として、台風の進路予報を上げたいと思います。台風の進路予報は台風の進路上の気圧配置、偏西風の強さや角度など、いろんな値を基に進路の予報円という形で、中心線とともに不確実さを知らせてくれるツールです。ただ時折、予報円を逸れてくる台風もあります。これは例えば台風予測で考えていないデータやその不確実性が引き起こしたもの（例、海面水温、発生したときの環境の測定誤差とか）が原因で、予期せぬ進路を取ったとします。
+これをVPAについて置き換えると以下のようになります。
+
+- 考えたデータの不確実性：資源量指標値（台風の例だと気圧配置）
+- 考えていないデータとその不確実性：年齢別漁獲尾数、年齢別体重、等々（台風の例だと海面水温）
+
+もちろん実際の台風の予測では海面水温等も使っているはずですが、イメージしやすいあくまで例です。
+
+この台風の例で伝えたかったことは、**VPAの過去の資源量が本当にこの通りかは分からない**ということです。**考えていないデータの不確実性**によって、推定や予測というのは十分に変わりうることを分かって頂けますと幸いです。
+
+
+### パラメータ間の相関
+
+```{r, warning=FALSE}
+
+res_boot$plot_cor
+
+```
+
+まず最終年のFは各年齢間で強い相関があることが分かります。これは選択率更新法では最終年最高齢のFしか推定していないので、その後はVPA計算の中でFが一意に決まっていることからも、想定通りです。
+
+あとはIndex1の非線形のパラメータであるb1は、推定しないので必ず1になることから、こういった感じになっています
+
+この資源量-資源量指数の非線形性を表すbというパラメータは推定が安定しないことでも有名ですが、b同士では相関が少なく今回は安定して推定できてることが分かるかと思います。
+
+推定最終年のSSBはもちろん最終年のFの推定値と強い相関がありますが、これはVPAの計算上こうなるものです。
+一方、bについてはb2を除いては相関しているわけではないことも確認されました。
+
+
+
+
+# 資料・参考文献
+
+
+- 令和2年度(2020年度)資源管理研修
+  - [VPA-01: frasyrを用いたVPA 概要編](https://www.youtube.com/watch?v=RSPX-SVMYog)
+  - [VPA-02: frasyrを用いたVPA 実践編1](https://www.youtube.com/watch?v=EuQja8yIOsc)
+  - [VPA-03: frasyrを用いたVPA 実践編2](https://www.youtube.com/watch?v=TErDeB9rQf8)
+  - [VPA-04: VPAのモデル診断 概要編](https://www.youtube.com/watch?v=xIloudJfHnc)
+  - [VPA-05: VPAのモデル診断 実践編](https://www.youtube.com/watch?v=JY6am-rNzPc)
+
+- frasyr内のスクリプト
+  - [VPA関数を使った資源量推定](https://ichim %>% omo.github.io/frasyr/articles/vpa.html)
+  - [VPAモデル診断スクリプト](https://ichimomo.github.io/frasyr/articles/Diagnostics-for-VPA.html)
+  
+- 市野川桃子, 岡村寛(2014). VPAを用いた我が国水産資源評価の統計言語Rによる統一的検討
+(http://www.jsfo.jp/contents/pdf/78-2/78-2-104.pdf)
+
+
+
+

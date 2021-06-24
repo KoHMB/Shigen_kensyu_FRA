@@ -65,14 +65,14 @@
 
     # 資源量指数のプロット
     cpue2 <- cpue
-    cpue2[1,] <- (cpue[1,]-mean(as.numeric(cpue[1,]), na.rm=TRUE))/
-      sd(as.numeric(cpue[1,]), na.rm=TRUE)
-    cpue2[2,] <- (cpue[2,]-mean(as.numeric(cpue[2,]), na.rm=TRUE))/
-      sd(as.numeric(cpue[2,]), na.rm=TRUE)
-    cpue2[3,] <- (cpue[3,]-mean(as.numeric(cpue[3,]), na.rm=TRUE))/
-      sd(as.numeric(cpue[3,]), na.rm=TRUE)
-    cpue2[4,] <- (cpue[4,]-mean(as.numeric(cpue[4,]), na.rm=TRUE))/
-      sd(as.numeric(cpue[4,]), na.rm=TRUE)
+    cpue2[1,] <- (cpue[1,]/
+                    mean(as.numeric(cpue[1,]), na.rm=TRUE))
+    cpue2[2,] <- (cpue[2,]/
+                    mean(as.numeric(cpue[2,]), na.rm=TRUE))
+    cpue2[3,] <- (cpue[3,]/
+                    mean(as.numeric(cpue[3,]), na.rm=TRUE))
+    cpue2[4,] <- (cpue[4,]/
+                    mean(as.numeric(cpue[4,]), na.rm=TRUE))
     matplot(1970:2018,t(cpue2), type = "l", xlim = c(2000,2018),
             ylab = "基準化CPUE")
     legend("topleft", legend = c("index1","index2","index3","index4"),
@@ -1015,6 +1015,53 @@ ggplot小話
 -   特にこのデータでは最近年のFが増加傾向にあるので、Fの推定も発散気味になってしまう
 -   このFの収束と資源量指標値のフィットを改善したものが**リッジVPA**と呼ばれる手法
 
+<!-- -->
+
+    res5.2 <- vpa(dat,
+                  tf.year = 2015:2017,
+                tune = TRUE,
+                term.F = "all",
+                alpha = 1,
+                abund = c("N","N","SSB","SSB"),
+                min.age = c(0,0,0,0),
+                max.age = c(0,0,6,6),
+                est.method="ml", #重み推定（最尤法）
+                b.est = TRUE, #b推定
+                sel.def="max",
+                p.init = res4.3$faa[,"2017"],
+                last.catch.zero=TRUE,
+                fc.year=2016:2018,
+                plot = TRUE,
+                plot.year = 2002:2018,
+                use.index =1:4,
+                sigma.constraint = c(1,1,2,2)
+    )
+
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+
+    ## Warning: Removed 137 rows containing non-finite values (stat_smooth).
+
+    ## Warning: Removed 137 rows containing missing values (geom_point).
+
+    ## Warning: Removed 137 rows containing missing values (geom_point).
+
+    ## Warning: Removed 128 row(s) containing missing values (geom_path).
+
+    ## Warning: Removed 137 rows containing missing values (geom_point).
+
+![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-26-1.png)
+
+    res5.2$faa[,as.character(2013:2017)]
+
+    ##         2013       2014        2015       2016         2017
+    ## 0 0.02336739 0.06180417 0.003626831 0.00468078  0.006758206
+    ## 1 0.23473893 0.10157924 0.128676840 0.02318417  0.009805086
+    ## 2 0.28376790 0.30533973 0.321909437 0.31743597  0.067846322
+    ## 3 0.64226932 0.54832753 0.533345385 0.62271538 16.172214955
+    ## 4 0.28209990 0.35898386 0.315539805 0.30611728  1.522025773
+    ## 5 1.19558458 0.44157477 0.536604811 0.73123664 16.601352492
+    ## 6 1.19558458 0.44157477 0.536604811 0.73123664 16.601352492
+
 Index3を取り除いてみる
 ----------------------
 
@@ -1060,7 +1107,7 @@ Index3を取り除いてみる
 
     ## Warning: Removed 104 rows containing missing values (geom_point).
 
-![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-26-1.png)
+![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-27-1.png)
 
     plot_vpa(list(res4.3=res4.3, res6.1=res6.1),
              what.plot = c("SSB", "biomass", "U", "Recruitment",
@@ -1068,7 +1115,7 @@ Index3を取り除いてみる
 
     ## Warning: Removed 2 rows containing missing values (geom_point).
 
-![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-27-1.png)
+![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-28-1.png)
 
 残差プロットやCPUEへのフィッティングを見る限り、決して悪くはありません。
 自己相関係数そのもの値も低く、フィットはいいかと思います。 。
@@ -1090,7 +1137,7 @@ Index3を取り除いてみる
 
     ## Warning: Removed 6 rows containing missing values (geom_point).
 
-![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-28-1.png)
+![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-29-1.png)
 
 Mohnのrhoを見て頂いても明確ですが、Index3を抜くことで決してレトロバイアスが減るわけではありません。
 推定精度が良くなるわけでもないですし、データを抜くというのは恣意的な作業の一つでもあります。
@@ -1106,7 +1153,7 @@ Mohnのrhoを見て頂いても明確ですが、Index3を抜くことで決し�
 
     ## Warning: Removed 4 rows containing missing values (geom_point).
 
-![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-29-1.png)
+![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-30-1.png)
 
 この後、詳細なモデル診断を進めていきますが、その前に一つベースモデルを決めておきたいと思います。
 
@@ -1184,20 +1231,20 @@ Mohnのrhoを見て頂いても明確ですが、Index3を抜くことで決し�
 
     res_jitter$graph$likelihood+geom_vline(aes(xintercept=res4.3$input$p.init), linetype=2)
 
-![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-31-1.png)
+![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-32-1.png)
 
     res_jitter$graph$estimated
 
     ## Warning: Removed 1 rows containing missing values (geom_point).
 
-![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-31-2.png)
+![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-32-2.png)
 
     res_jitter$graph$estimated+ylim(0,NA)
 
     ## Scale for 'y' is already present. Adding another scale for 'y', which will
     ## replace the existing scale.
 
-![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-31-3.png)
+![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-32-3.png)
 
 4-4. 感度分析
 -------------
@@ -1229,7 +1276,7 @@ Mohnのrhoを見て頂いても明確ですが、Index3を抜くことで決し�
 
     ## Warning: Removed 3 rows containing missing values (geom_point).
 
-![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-32-1.png)
+![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-33-1.png)
 
 最近年の成熟率がSSBに与える影響が大きいのはある意味想定内です
 加入やバイオマス全体の動態が大きく変動していないので、この生物学的パラメータに対してある程度頑健であると言えます
@@ -1251,11 +1298,11 @@ Mohnのrhoを見て頂いても明確ですが、Index3を抜くことで決し�
 
     ## Warning: Removed 2705 rows containing missing values (geom_point).
 
-![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-33-1.png)
+![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-34-1.png)
 
     res_jackknife$JKplot_par
 
-![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-33-2.png)
+![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-34-2.png)
 
 Index2がないと加入量や資源量が大きく推定されることが分かります。
 その次にIndex1はの影響が大きく見えます。
@@ -1265,7 +1312,7 @@ Index2がないと加入量や資源量が大きく推定されることが分�
 
     ## Warning: Removed 120 row(s) containing missing values (geom_path).
 
-![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-34-1.png)
+![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-35-1.png)
 
 さて、Index3を除いた(×印)場合の結果についてです。このデータは残差の自己相関係数が有意でモデルの妥当性について疑問が残っていたところかと思います。
 さきほどの`res6.1`では、実際に取り除いて確認しましたが、ここでも同じことをしています。そしてこのデータを抜いても資源量推定の傾向などに大きな違いがないことがなく、その影響力は限定的だということが分かります。
@@ -1298,7 +1345,7 @@ Index2がないと加入量や資源量が大きく推定されることが分�
 
     ## Warning: Removed 1 row(s) containing missing values (geom_path).
 
-![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-37-1.png)
+![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-38-1.png)
 
     # 2000年以降でプロット
     (res_boot$plot_ssb+ggtitle("SSB")+xlim(2010,2018)) /
@@ -1311,7 +1358,7 @@ Index2がないと加入量や資源量が大きく推定されることが分�
 
     ## Warning: Removed 41 row(s) containing missing values (geom_path).
 
-![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-37-2.png)
+![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-38-2.png)
 
 #### VPAで考えられる不確実性の限界
 
@@ -1339,7 +1386,7 @@ Index2がないと加入量や資源量が大きく推定されることが分�
 
     res_boot$plot_cor
 
-![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-38-1.png)
+![](資源管理研修VPA編スクリプト_files/figure-markdown_strict/unnamed-chunk-39-1.png)
 
 まず最終年のFは各年齢間で強い相関があることが分かります。これは選択率更新法では最終年最高齢のFしか推定していないので、その後はVPA計算の中でFが一意に決まっていることからも、想定通りです。
 

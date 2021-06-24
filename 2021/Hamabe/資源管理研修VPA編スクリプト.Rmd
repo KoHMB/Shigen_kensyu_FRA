@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = TRUE, fig.height = 10, fig.width = 14)
 ```
 
 
-# はじめに
+# はじめに  
 
 - 実際にある資源のデータを使ってVPA計算とモデル診断を模擬的に行います
 - 資源管理研修用に少し調整したデータとなっています
@@ -32,7 +32,7 @@ knitr::opts_chunk$set(echo = TRUE, fig.height = 10, fig.width = 14)
   
 
 
-# 0. 準備
+# 0. 準備  
 
 
 まずは以下のようにして`frasyr`を呼び出します。
@@ -60,14 +60,14 @@ dat$index[1:2,"2018"] <- NA
 
 # 資源量指数のプロット
 cpue2 <- cpue
-cpue2[1,] <- (cpue[1,]-mean(as.numeric(cpue[1,]), na.rm=TRUE))/
-  sd(as.numeric(cpue[1,]), na.rm=TRUE)
-cpue2[2,] <- (cpue[2,]-mean(as.numeric(cpue[2,]), na.rm=TRUE))/
-  sd(as.numeric(cpue[2,]), na.rm=TRUE)
-cpue2[3,] <- (cpue[3,]-mean(as.numeric(cpue[3,]), na.rm=TRUE))/
-  sd(as.numeric(cpue[3,]), na.rm=TRUE)
-cpue2[4,] <- (cpue[4,]-mean(as.numeric(cpue[4,]), na.rm=TRUE))/
-  sd(as.numeric(cpue[4,]), na.rm=TRUE)
+cpue2[1,] <- (cpue[1,]/
+                mean(as.numeric(cpue[1,]), na.rm=TRUE))
+cpue2[2,] <- (cpue[2,]/
+                mean(as.numeric(cpue[2,]), na.rm=TRUE))
+cpue2[3,] <- (cpue[3,]/
+                mean(as.numeric(cpue[3,]), na.rm=TRUE))
+cpue2[4,] <- (cpue[4,]/
+                mean(as.numeric(cpue[4,]), na.rm=TRUE))
 matplot(1970:2018,t(cpue2), type = "l", xlim = c(2000,2018),
         ylab = "基準化CPUE")
 legend("topleft", legend = c("index1","index2","index3","index4"),
@@ -79,7 +79,7 @@ legend("topleft", legend = c("index1","index2","index3","index4"),
 特に、加入の指数であるIndex1とIndex2は2013年に大きな値を取っています。  
 
 
-# 1. チューニング無VPA
+# 1. チューニング無VPA  
 
 
 VPAは年齢別漁獲尾数データから資源量計算が可能な解析手法です。
@@ -635,6 +635,36 @@ res5.1$faa[,as.character(2013:2017)]
 - 先述の通り、VPAは最終年のFでしか個体群動態の挙動を動かすことができないから
 - 特にこのデータでは最近年のFが増加傾向にあるので、Fの推定も発散気味になってしまう
 - このFの収束と資源量指標値のフィットを改善したものが**リッジVPA**と呼ばれる手法
+
+
+```{r, fig.height = 15, fig.width = 14}
+
+res5.2 <- vpa(dat,
+              tf.year = 2015:2017,
+            tune = TRUE,
+            term.F = "all",
+            alpha = 1,
+            abund = c("N","N","SSB","SSB"),
+            min.age = c(0,0,0,0),
+            max.age = c(0,0,6,6),
+            est.method="ml", #重み推定（最尤法）
+            b.est = TRUE, #b推定
+            sel.def="max",
+            p.init = res4.3$faa[,"2017"],
+            last.catch.zero=TRUE,
+            fc.year=2016:2018,
+            plot = TRUE,
+            plot.year = 2002:2018,
+            use.index =1:4,
+            sigma.constraint = c(1,1,2,2)
+)
+
+res5.2$faa[,as.character(2013:2017)]
+
+
+```
+
+
 
 ## Index3を取り除いてみる
 

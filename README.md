@@ -6,16 +6,16 @@
 
 ## 各ファイルの概要
 
-- Base(): 資源管理の基礎について
-- Info(): 研修の補助資料
-- R(): R初心者講習
-- Tool(): frasyrの開発・GitHubについて
-- VPA(): 資源評価モデルVPAについて
+- [Base](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/Base): 資源管理の基礎について
+- [Info](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/Info): 研修の補助資料
+- [R](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/R): R初心者講習
+- Tool: frasyrの開発・GitHubについて
+- [VPA](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/VPA): 資源評価モデルVPAについて
 
 
 ## 更新
 
-- (2021/07/02) 2021年度資源管理研修開洋のページを更新しました
+- (2021/07/02) 2021年度資源管理研修会用のページを更新しました
 - (2021/06/24) 本GitHubページを開設しました
 
 
@@ -28,9 +28,9 @@
 
 ## 2021年度配布ファイル
 
-- [実データを用いたfrasyrによるVPA解析]()
+- [実データを用いたfrasyrによるVPA解析](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/VPA/VPA-06-09(2021))
 
-- [R初心者講習 CPUE標準化用データ]()
+- [R初心者講習 CPUE標準化用データ](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/R)
 
 
 

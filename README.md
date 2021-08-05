@@ -11,6 +11,7 @@
 - [R](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/R): R初心者講習
 - Tool: frasyrの開発・GitHubについて
 - [VPA](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/VPA): 資源評価モデルVPAについて
+- [MR](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/MR): 標識再捕法と遺伝情報の利活用について
 
 
 ## 更新

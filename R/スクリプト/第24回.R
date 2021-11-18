@@ -1,5 +1,5 @@
 # 第23回作成データの読み込みと確認
-load("res_lm_catch.rda")
+load("../資源管理研修2021/res_lm_catch.rda")
 head(res_lm_catch)
 
 # lm結果の残差プロット
@@ -23,3 +23,16 @@ qqnorm(res_lm_catch$residuals)
 
 # lm結果の残差に対してShapiro-Wikl test
 shapiro.test(res_lm_catch$residuals)
+
+# performance packageを利用
+install.packages("performance")
+library(performance)
+
+# check_normalityで正規性の確認
+no_check <- check_normality(res_lm_catch)
+
+# plotして確認
+# see packageが必要と出るのでインストール＆ライブラリ読み込みしてから
+# install.packages("see")
+# library(see)
+plot(no_check)

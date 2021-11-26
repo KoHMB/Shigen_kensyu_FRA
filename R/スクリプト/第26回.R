@@ -1,22 +1,37 @@
-
-# check df
-summary(res_lm_catch) #lm case
-res_glm_gala #glm case
-
-# chi squire test
-RPS <- c(40,20,40)
-names(RPS_obs)<-c("Rock","Paper","Scissors")
-chisq.test(RPS)
-
-# read csv data
-catch_data2 <- read.csv("xx")
+data(gala,package = "faraway")
+names(gala)
 
 # glm
-res_glm_catch <- glm(catch~vessel+temp-1,family = poisson(link = "log"), data = catch_data2)
+res_glm_gala <- glm(Species~. - Endemics, family=poisson(link = "log"),data=gala)
 
-plot(catch_data2$temp,catch_data2$catch)
+# check glm result and deviance
+summary(res_glm_gala)
 
+resid_glm_gala <- residuals(res_glm_gala,type = "deviance")
+plot(resid_glm_gala)
 
-# check over dispersion
+# glm catch_data2
+
+# read catch data
+catch_data <- read.csv("catch_data2.csv")
+
+# glm; catch ~ vessel + temp + area
+res_glm_catch <- glm(catch~as.factor(vessel)+temp+as.factor(area)-1,family = poisson(link="log"),data=catch_data)
+summary(res_glm_catch2)
+res_glm_catch$aic
+
+library(MuMIn)
+options(na.action="na.fail")
+dredge_glm_catch<-dredge(res_glm_catch,rank=AIC)
+get.models(dredge_glm_catch2,subset=1)
+
+# count data# by each area
+barplot(table(catch_data$area))
+
+# glm; catch ~ vessel + temp
+res_glm_catch2 <- glm(catch~as.factor(vessel)+temp-1,family = poisson(link="log"),data=catch_data)
+res_glm_catch2$aic
+
 library(performance)
-over_dispersion <- check_overdispersion(res_glm_catch)
+check_overdispersion(res_glm_catch2)
+

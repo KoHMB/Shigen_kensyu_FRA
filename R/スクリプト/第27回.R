@@ -5,18 +5,15 @@ res_glm_gala #glm case
 
 # chi squire test
 RPS <- c(40,20,40)
-names(RPS_obs)<-c("Rock","Paper","Scissors")
+names(RPS)<-c("Rock","Paper","Scissors")
 chisq.test(RPS)
 
 # read csv data
-catch_data2 <- read.csv("xx")
+catch_data <- read.csv("catch_data2.csv")
 
-# glm
-res_glm_catch <- glm(catch~vessel+temp-1,family = poisson(link = "log"), data = catch_data2)
+# glm analysis
+res_glm_catch <- glm(catch~as.factor(vessel)+temp-1,family = poisson(link=log),data = catch_data)
 
-plot(catch_data2$temp,catch_data2$catch)
-
-
-# check over dispersion
+# check overdispersion
 library(performance)
-over_dispersion <- check_overdispersion(res_glm_catch)
+check_overdispersion(res_glm_catch)

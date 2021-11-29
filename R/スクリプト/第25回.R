@@ -1,5 +1,5 @@
 # 第23回作成データの読み込みと確認
-load("../資源管理研修2021/res_lm_catch.rda")
+load("res_lm_catch.rda")
 head(res_lm_catch)
 
 # lm結果の残差プロット

@@ -1,30 +1,32 @@
+data(gala,package = "faraway")
+names(gala)
 
-# read data fram csv file
+# glm
+res_glm_gala <- glm(Species~. - Endemics, family=poisson(link = "log"),data=gala)
+
+# check glm result and deviance
+summary(res_glm_gala)
+
+resid_glm_gala <- residuals(res_glm_gala,type = "deviance")
+plot(resid_glm_gala)
+
+# glm catch_data2
+# read catch data
 catch_data <- read.csv("catch_data2.csv")
 
-# install glmmML
-install.packages(glmmML)
-library(glmmML)
+# glm; catch ~ vessel + temp + area
+res_glm_catch <- glm(catch~as.factor(vessel)+temp+as.factor(area)-1,family = poisson(link="log"),data=catch_data)
+summary(res_glm_catch)
+res_glm_catch$aic
 
-res_glmm_catch <- glmmML(catch~vessel+temp,family = poisson(link = "log"), data = catch_data, cluster = as.factor(area), method = "Laplace")
-summary(res_glmm_catch)
+library(MuMIn)
+options(na.action="na.fail")
+dredge_glm_catch<-dredge(res_glm_catch,rank=AIC)
+get.models(dredge_glm_catch,subset=1)
 
-#install.packages("lme4")
-library(lme4)
-res_glmm_catch2 <- glmer(catch~vessel+temp+(1|area),family = poisson(link = "log"), data = catch_data)
-summary(res_glmm_catch2)
+# count data# by each area
+barplot(table(catch_data$area))
 
-# compare aic
-res_glm_catch$aic   # glm; catch ~ vessel + temp
-res_glm_catch2$aic  # glm; catch ~ vessel + temp + area
-res_glmm_catch$aic  # glmm;catch ~ vessel + temp + random(area) (glmmML)
-res_glmm_catch2$aic # glmm;catch ~ vessel + temp + random(area) (glmer)
-
-# glmm結果から推定係数の取り出し
-#固定効果
-res_glmm_catch$coefficients
-#ランダム効果
-res_glmm_catch$sigma
-
-# glmm結果から推定係数の誤差の取り出し
-res_glmm_catch$coef.sd
+# glm; catch ~ vessel + temp
+res_glm_catch2 <- glm(catch~as.factor(vessel)+temp-1,family = poisson(link="log"),data=catch_data)
+res_glm_catch2$aic

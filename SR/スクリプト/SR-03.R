@@ -40,26 +40,25 @@ corSR(resL1HS)
 corSR(resL2RIARout1)
 corSR(resL2BHARout0)
 
-# スティープネス
+# スティープネス ----
 resL1HS$steepness
 
-# 残差の自己相関のチェック
-outer1HS = calc.residAR(resL1HS, output = TRUE, filename = "residARouter")
+# 残差の自己相関のチェック ----
+outer1HS = calc.residAR(resL1HS, output = TRUE, filename = "L1HSresidARouter")
 outer1HS
 
 # 残差の自己相関をプロット
 autocor.plot(resL1HS) #デフォルトはuse.resid = 1
-autocor.plot(resL1HS, output = TRUE, filename = "devianceAR")
+autocor.plot(resL1HS, output = TRUE, filename = "L1HSdevianceAR")
 
-autocor.plot(resL1HS,use.resid = 2)
-autocor.plot(resL1HS,use.resid = 2, output = TRUE, filename = "residAR")
+autocor.plot(resL1HS,use.resid = 2, output = TRUE, filename = "L1HSresidAR")
 
-# ブートストラップ解析
+# ブートストラップ解析(parametric) ----
 boot.resL1HS = boot.SR(resL1HS, n = 1000, method = "p")
+# 結果のプロット
+bootSR.plot(boot.resL1HS,output = T,filename = "bootresL1HS")
 
-bootSR.plot(boot.resL1HS)
-
-# ジャックナイフ解析
+# ジャックナイフ解析 ----
 jackknife.SR(resL1HS)
-
+# 図を保存する場合
 jack.resL1HS = jackknife.SR(resL1HS, output = TRUE, is.plot = TRUE)

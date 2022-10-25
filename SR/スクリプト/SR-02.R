@@ -1,13 +1,13 @@
 # 2022 資源管理研修 SR-02
 
-# frasyrのインストールとライブラリーの読み込み
+# frasyrのインストールとライブラリーの読み込み ----
 devtools::install_github("ichimomo/frasyr@dev")
 library(frasyr)
 
-# 例データの呼び出し
+# 例データの呼び出し ----
 data("res_vpa_example")
 
-# vpaオブジェクトからSRdataへの整形
+# vpaオブジェクトからSRdataへの整形 ----
 SRdata_ex <- get.SRdata(vpares = res_vpa_example,weight.year = 0)
 
 # 確認
@@ -26,12 +26,13 @@ plot_SRdata(SRdata_ex)
 #SRdata_ex2 <- get.SRdata(vpares = res_vpa_example,weight.year=c(min(as.numeric(colnames(res_vpa_example$ssb))):max(as.numeric(colnames(res_vpa_example$ssb)))-3))
 
 
-# bio_paroオブジェクトの作成(vpaへ入力したデータの最終年から前5年平均)
+# bio_paroオブジェクトの作成(vpaへ入力したデータの最終年から前5年平均) ----
 bio_par <- derive_biopar(res_obj = res_vpa_example,derive_year = c((max(SRdata_ex$year)-4):max(SRdata_ex$year)),stat=mean)
 # 確認
 bio_par
 
 
+# 再生産関係の推定 ----
 # 再生産関係にHockey-Stick型を指定、推定方法を最小絶対値法とし（method="L1"）、自己相関を仮定しない（AR=0）場合
 resL1HS = fit.SR(SRdata = SRdata_ex,
                  SR = "HS",
@@ -68,6 +69,23 @@ SRplotHS<-SRplot_gg(resL1HS)
 # プロットをpngファイルで出力
 ggsave_SH(SRplotHS,file="L1HS.png")
 
+# 再生産関係にRicker型を指定、推定方法を最小二乗法とし（method="L2"）、自己相関を仮定（AR=1）、2段階で推定する場合
+resL2RIARout1 = fit.SR(SRdata = SRdata_ex,
+                 SR = "RI",
+                 method = "L2",
+                 out.AR = TRUE,
+                 AR = 1,
+                 bio_par = bio_par)
+
+# 再生産関係にBeverton-Holt型を指定、推定方法を最小二乗法とし（method="L2"）、自己相関を仮定（AR=1）、同時推定する場合
+resL2BHARout0 = fit.SR(SRdata = SRdata_ex,
+                 SR = "BH",
+                 method = "L2",
+                 out.AR = FALSE,
+                 AR = 1,
+                 bio_par = bio_par)
+
+# 以下レジームシフトを想定する場合 ----
 
 # 再生産関係にHockey-Stick型を指定、推定方法を最小絶対値法とし（method="L1"）、2005年にレジームが切り替わり、a,b,sdがレジームで変更される場合
 resR1_L1HS <- fit.SRregime(SRdata_ex, SR = "HS",
@@ -96,8 +114,9 @@ resR11_L1HS <- fit.SRregime(SRdata, SR = "HS", method = "L1", regime.year = c(20
 # 結果をテキストでファイル出力
 out.SR(resR11_L1HS,filename = "R11L1HS")
 # 推定結果をプロット
-plot_SRregime(resR11_L1HS)
-SRregime_plot(resR11_L1HS, regime.name = c("A","B"),themeSH = T)
+plot_SRregime(resp_R11_L1HS)
+p_R11_L1HS<- SRregime_plot(resR11_L1HS, regime.name = c("A","B"),themeSH = T)
+ggsave_SH(p_R11_L1HS,file="R11_L1HS.png")
 
 # 再生産関係にべバートンホルト型を指定、推定方法を最小二乗法とし（method="L2"））、2005年にレジームが切り替わり、b,sdがレジームで変更される場合
 resR1_L2BH <- fit.SRregime(SRdata, SR = "BH", method = "L2", regime.year = c(2005), regime.par = c("a","b","sd")[2:3], use.fit.SR = TRUE, regime.key = c(0, 1), bio_par=bio_par)

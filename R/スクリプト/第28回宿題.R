@@ -1,26 +1,59 @@
+
 catch_data <- read.csv("catch_data2.csv")
+
 # glm analysis
-res_glm_catch2 <- glm(catch~as.factor(vessel)+temp-1,family = poisson(link=log),data = catch_data)
-summary(res_glm_catch2)
+res_glm_catch <- glm(catch~as.factor(vessel)+temp-1,family = poisson(link=log),data = catch_data)
+summary(res_glm_catch)
 
-# check overdispersion by plot
-plot(catch~temp,data=catch_data,ylim=c(0,max(catch_data$catch)))
-par(new=T)
-plot(res_glm_catch2$fitted.values~catch_data$temp,col="red",ylim=c(0,max(catch_data$catch)))
+# check overdispersion
+library(performance)
+check_overdispersion(res_glm_catch)
 
-# 船v1の結果を取り出す
-catch_data_v1 <- subset(catch_data,catch_data$vessel=="v1")
-res_glm_fitted_v1 <-res_glm_catch2$fitted.values[which(catch_data$vessel=="v1")]
+pred_catch_data <- data.frame(vessel=catch_data$vessel,temp=catch_data$temp,obs=catch_data$catch,pred=res_glm_catch$fitted.values)
 
-PI_glm_catch_lwr <- qpois(res_glm_fitted_v1,p = 0.025)
-PI_glm_catch_upr <- qpois(res_glm_fitted_v1,p = 0.975)
+# 95% PI
+pred_catch_data$PI95_lwr <- qpois(res_glm_catch$fitted.values,p = 0.025)
+pred_catch_data$PI95_upr <- qpois(res_glm_catch$fitted.values,p = 0.975)
 
-# obs data, fitted, and 95% PI
-plot(catch_data_v1$temp,catch_data_v1$catch,ylim=c(0,max(catch_data_v1$catch)),xlab="Temperature",ylab="Catch")
-par(new=T)
-plot(catch_data_v1$temp,res_glm_fitted_v1,col="red",ylim=c(0,max(catch_data_v1$catch)),xlab="",ylab = "")
-par(new=T)
-plot(catch_data_v1$temp,PI_glm_catch_upr,col="blue",ylim=c(0,max(catch_data_v1$catch)),xlab="",ylab = "")
-par(new=T)
-plot(catch_data_v1$temp,PI_glm_catch_lwr,col="blue",ylim=c(0,max(catch_data_v1$catch)),xlab="",ylab = "")
+head(pred_catch_data)
 
+# 95%CIも計算してみる
+# 95% CI
+CI_param_glm_catch <- confint(res_glm_catch)
+
+pred_catch_data$CI95_lwr<-c(exp(CI_param_glm_catch[1,1]+CI_param_glm_catch[4,1]*catch_data$temp[which(catch_data$vessel=="v1")]),exp(CI_param_glm_catch[2,1]+CI_param_glm_catch[4,1]*catch_data$temp[which(catch_data$vessel=="v2")]),exp(CI_param_glm_catch[3,1]+CI_param_glm_catch[4,1]*catch_data$temp[which(catch_data$vessel=="v3")]))
+pred_catch_data$CI95_upr<-c(exp(CI_param_glm_catch[1,2]+CI_param_glm_catch[4,2]*catch_data$temp[which(catch_data$vessel=="v1")]),exp(CI_param_glm_catch[2,2]+CI_param_glm_catch[4,2]*catch_data$temp[which(catch_data$vessel=="v2")]),exp(CI_param_glm_catch[3,2]+CI_param_glm_catch[4,2]*catch_data$temp[which(catch_data$vessel=="v3")]))
+
+library(RColorBrewer)
+plot_data <- function(data,interval="CI"){
+  par(oma=c(1,1,0,0))
+  col <- brewer.pal(length(unique(data$vessel)),"Set1")
+  i <- 1
+  for(v in unique(data$vessel)){
+    data_tmp <- data[data$vessel==v,]
+    data_tmp <- data_tmp[order(data_tmp$temp),]
+    if(i > 1) par(new=T)
+    plot(data_tmp$temp, data_tmp$obs, xlim=c(min(data$temp),max(data$temp)), ylim=c(min(data$obs), max(data$obs)), col=col[i], xlab="", ylab="", type="p", pch=21, cex=0.5)
+    par(new=T)
+    plot(data_tmp$temp, data_tmp$pred, xlim=c(min(data$temp),max(data$temp)), ylim=c(min(data$obs), max(data$obs)), col=col[i], xlab="", ylab="", type="l")
+    if(interval=="CI"){
+      par(new=T)
+      plot(data_tmp$temp, data_tmp$CI95_upr, xlim=c(min(data$temp),max(data$temp)), ylim=c(min(data$obs), max(data$obs)), col=col[i], xlab="", ylab="", type="l",lty ="dashed")
+      par(new=T)
+      plot(data_tmp$temp, data_tmp$CI95_lwr, xlim=c(min(data$temp),max(data$temp)), ylim=c(min(data$obs), max(data$obs)), col=col[i], xlab="", ylab="", type="l",lty ="dashed")
+    }else if(interval=="PI"){
+      par(new=T)
+      plot(data_tmp$temp, data_tmp$PI95_upr, xlim=c(min(data$temp),max(data$temp)), ylim=c(min(data$obs), max(data$obs)), col=col[i], xlab="", ylab="", type="l",lty ="dashed")
+      par(new=T)
+      plot(data_tmp$temp, data_tmp$PI95_lwr, xlim=c(min(data$temp),max(data$temp)), ylim=c(min(data$obs), max(data$obs)), col=col[i], xlab="", ylab="", type="l",lty ="dashed")
+      
+    }
+    i <- i+1
+  }
+  mtext("Temperature", side=1, cex=1.2, outer=T)
+  mtext("Catch", side=2, cex=1.2, outer=T)
+}
+
+plot_data(pred_catch_data)
+
+plot_data(pred_catch_data,interval = "PI")

@@ -12,6 +12,7 @@ head(PI95)
 #vessel1について温度を横軸にlog(catch)を縦軸にプロット
 PI95v1<-PI95[which(catch_data$vessel=="v1"),]
 yrange=c(min(PI95v1[,2]),max(PI95v1[,3]))
+
 plot(catch_data$temp[which(catch_data$vessel=="v1",)],log(catch_data$catch[which(catch_data$vessel=="v1",)]),xlab="temp",ylab="log(catch)",ylim=yrange)
 par(new=T)
 plot(catch_data$temp[which(catch_data$vessel=="v1",)],PI95v1[,2],type="l",col="blue",xlab="",ylab="",ylim=yrange)
@@ -52,11 +53,12 @@ res_glm_gala <- glm(Species~. - Endemics, family=poisson(link = "log"),data=gala
 # 95% PI
 PI95_lwr_gala <- qpois(res_glm_gala$fitted.values,p = 0.025)
 PI95_upr_gala <- qpois(res_glm_gala$fitted.values,p = 0.975)
-plot(log(gala$Area),res_glm_gala$fitted.values,ylim=c(0,max(CI95_upr_gala)),ylab="")
+
+plot(log(gala$Area),res_glm_gala$fitted.values,ylim=c(0,max(PI95_upr_gala)),ylab="")
 par(new=T)
-plot(log(gala$Area),PI95_lwr_gala,col="green",ylim=c(0,max(CI95_upr_gala)),ylab="")
+plot(log(gala$Area),PI95_lwr_gala,col="green",ylim=c(0,max(PI95_upr_gala)),ylab="")
 par(new=T)
-plot(log(gala$Area),PI95_upr_gala,col="green",ylim=c(0,max(CI95_upr_gala)),ylab="")
+plot(log(gala$Area),PI95_upr_gala,col="green",ylim=c(0,max(PI95_upr_gala)),ylab="")
 
 
 # check df
@@ -71,11 +73,18 @@ chisq.test(RPS)
 # read csv data
 catch_data2 <- read.csv("catch_data2.csv")
 
-# glm
+# glm（カテゴリで60個あるareaを説明変数に）
+res_glm_catch <- glm(catch~vessel+temp+as.factor(area)-1,family = poisson(link = "log"), data = catch_data2)
+
+# glm（areaを説明変数に入れず）
 res_glm_catch2 <- glm(catch~vessel+temp-1,family = poisson(link = "log"), data = catch_data2)
 
-plot(catch_data2$temp,catch_data2$catch)
+# plotして予測値と実際の目的変数のばらつきをみる (95%PIは宿題)
+plot(catch_data2$temp,catch_data2$catch,ylim = c(min(catch_data2$catch),max(catch_data2$catch)),xlab="temp",ylab="catch")
+par(new=T)
+plot(catch_data2$temp,res_glm_catch2$fitted.values,col="red",ylim = c(min(catch_data2$catch),max(catch_data2$catch)),xlab="",ylab="")
 
 # check over dispersion
 library(performance)
-over_dispersion <- check_overdispersion(res_glm_catch2)
+over_dispersion <- check_overdispersion(res_glm_catch)
+over_dispersion2 <- check_overdispersion(res_glm_catch2)

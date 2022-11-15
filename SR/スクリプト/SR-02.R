@@ -31,7 +31,6 @@ bio_par <- derive_biopar(res_obj = res_vpa_example,derive_year = c((max(SRdata_e
 # 確認
 bio_par
 
-
 # 再生産関係の推定 ----
 # 再生産関係にHockey-Stick型を指定、推定方法を最小絶対値法とし（method="L1"）、自己相関を仮定しない（AR=0）場合
 resL1HS = fit.SR(SRdata = SRdata_ex,
@@ -43,7 +42,8 @@ resL1HS = fit.SR(SRdata = SRdata_ex,
 
 # 結果オブジェクトの中身
 names(resL1HS)
-resL1HS
+resL1HS$pars
+
 # 結果をテキストでファイル出力
 out.SR(resL1HS,filename = "L1HS")
 # 推定結果をプロット
@@ -68,6 +68,14 @@ SRplot_gg(resL1HS,
 SRplotHS<-SRplot_gg(resL1HS)
 # プロットをpngファイルで出力
 ggsave_SH(SRplotHS,file="L1HS.png")
+
+# サイズ指定変更などはggsaveで
+# ※ggsaveがないと言われたらlibrary(ggplot2)を読み込んでから実行
+ggsave(SRplotHS,file="L1HS-sizedpi.png", 
+          unit = "mm", 
+          width = 120,
+          height = 120,
+          dpi = 600)
 
 # 再生産関係にRicker型を指定、推定方法を最小二乗法とし（method="L2"）、自己相関を仮定（AR=1）、2段階で推定する場合
 resL2RIARout1 = fit.SR(SRdata = SRdata_ex,
@@ -102,7 +110,7 @@ plot_SRregime(resR1_L1HS)
 # オブジェクトとして書き出す
 p_R1_L1HS<-SRregime_plot(resR1_L1HS,
                          regime.name = c("A","B"))
-# ggsaveで図として保存
+# ggsaveで図として保存 ※library(ggplot2)を読み込んで
 ggsave(p_R1_L1HS,
        file = "plotR1L1HS.png",
        unit = "mm", width = 240,

@@ -1,3 +1,5 @@
+# 2022 資源管理研修 SR-03
+
 # SR-02のスクリプトを回した推定結果オブジェクトがRに格納されていることを前提にします
 
 # AIC,AICcやBICを比較してフィットの良いモデルは何かを探る ----
@@ -14,8 +16,8 @@ for(i in 1:nrow(SRarglist)){
 SRlist <- cbind(SRarglist,AIC,AICc,BIC)
 SRlist <- SRlist[-which(SRlist$AR==0 & SRlist$out.AR==TRUE),]
 
-# SR関係推定結果オブジェクトをプロットして、推定の信頼区間も表示 ----
-SRplot_gg(resL2RIARout1,plot_CI=T,CI=0.95)
+# SR関係推定結果オブジェクトをプロットして、推定の予測区間も表示 ----
+SRplot_gg(resL2RIARout1,plot_CI=T)
 
 # 収束判定 ----
 checkL1HS<-check.SRfit(resL1HS)

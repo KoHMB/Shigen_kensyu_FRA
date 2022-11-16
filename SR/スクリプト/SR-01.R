@@ -1,4 +1,7 @@
-
+# 2022 資源管理研修 SR-01
+# frasyrのインストールとライブラリーの読み込み ----
+#devtools::install_github("ichimomo/frasyr@dev")
+library(frasyr)
 data("res_vpa_example")
 
 SRdata<-get.SRdata(res_vpa_example,weight.year = 0)

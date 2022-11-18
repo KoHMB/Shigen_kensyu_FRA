@@ -17,11 +17,15 @@ SRlist <- cbind(SRarglist,AIC,AICc,BIC)
 SRlist <- SRlist[-which(SRlist$AR==0 & SRlist$out.AR==TRUE),]
 
 # SR関係推定結果オブジェクトをプロットして、推定の予測区間も表示 ----
-SRplot_gg(resL2RIARout1,plot_CI=T)
+SRplot_gg(resL1HS,plot_CI=T)
 
-# 収束判定 ----
+# 推定したパラメータの収束や残差について確認----
+# 収束判定 ※③を除く----
 checkL1HS<-check.SRfit(resL1HS)
-# L1HSは解が複数でる
+# L1HSは解が複数でるので、複数の推定値が互いに近傍であれば中央値を使う
+# 中央値はoptimumに格納される
+names(checkL1HS$optimum)
+resL1HSchecked<-checkL1HS$optimum
 
 # 残差分布 ----
 check.SRdist(resL1HS)
@@ -30,20 +34,12 @@ dev.off()
 
 # プロファイル尤度 ----
 prof.likSR(resL1HS)
+prof.likSR(resL1HSchecked)
 # 図を保存する場合
 prof.likSR(resL1HS, output = TRUE, filename = "ResidDistCheck_L1HS")
 
 prof.likSR(resL2RIARout1)
 prof.likSR(resL2BHARout0)
-
-# パラメータ間相関 ----
-corSR(resL1HS)
-
-corSR(resL2RIARout1)
-corSR(resL2BHARout0)
-
-# スティープネス ----
-resL1HS$steepness
 
 # 残差の自己相関のチェック ----
 outer1HS = calc.residAR(resL1HS, output = TRUE, filename = "L1HSresidARouter")
@@ -64,3 +60,15 @@ bootSR.plot(boot.resL1HS,output = T,filename = "bootresL1HS")
 jackknife.SR(resL1HS)
 # 図を保存する場合
 jack.resL1HS = jackknife.SR(resL1HS, output = TRUE, is.plot = TRUE)
+
+# 再生産関係の密度効果について確認----
+# パラメータ間相関 ----
+corSR(resL1HS)
+
+corSR(resL2RIARout1)
+corSR(resL2BHARout0)
+
+# スティープネス ----
+resL1HS$steepness
+
+

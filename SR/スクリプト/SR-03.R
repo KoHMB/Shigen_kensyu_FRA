@@ -4,6 +4,7 @@
 
 # AIC,AICcやBICを比較してフィットの良いモデルは何かを探る ----
 SRarglist <- expand.grid(SR=c("HS","BH","RI"),AR=c(0,1),out.AR=c(FALSE,TRUE))
+SRarglist <- SRarglist[-which(SRarglist$AR==0 & SRarglist$out.AR==TRUE),]
 resfitSRlist<-list()
 AIC <- AICc <- BIC <- c()
 for(i in 1:nrow(SRarglist)){
@@ -14,7 +15,6 @@ for(i in 1:nrow(SRarglist)){
   BIC <- c(BIC,resfitSRlist[[i]]$BIC)
 }
 SRlist <- cbind(SRarglist,AIC,AICc,BIC)
-SRlist <- SRlist[-which(SRlist$AR==0 & SRlist$out.AR==TRUE),]
 
 # SR関係推定結果オブジェクトをプロットして、推定の予測区間も表示 ----
 SRplot_gg(resL1HS,plot_CI=T)

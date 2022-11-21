@@ -110,16 +110,16 @@ ggsave(p_R1_L1HS,
        dpi = 600)
 
 # 再生産関係にHockey-Stick型を指定、推定方法を最小絶対値法とし（method="L1"））、2005年、2010年にレジームが切り替わるが、2004年以前2010年以後は同じレジームとみなせて、a,b,sdがレジームで変更される場合
-resR11_L1HS <- fit.SRregime(SRdata, SR = "HS", method = "L1", regime.year = c(2005,2010), regime.par = c("a","b","sd")[1:3], use.fit.SR = TRUE, regime.key = c(0, 1, 0), bio_par=bio_par)
+resR11_L1HS <- fit.SRregime(SRdata_ex, SR = "HS", method = "L1", regime.year = c(2005,2010), regime.par = c("a","b","sd")[1:3], use.fit.SR = TRUE, regime.key = c(0, 1, 0), bio_par=bio_par)
 # 結果をテキストでファイル出力
 out.SR(resR11_L1HS,filename = "R11L1HS")
 # 推定結果をプロット
-plot_SRregime(resp_R11_L1HS)
+plot_SRregime(resR11_L1HS)
 p_R11_L1HS<- SRregime_plot(resR11_L1HS, regime.name = c("A","B"),themeSH = T)
 ggsave_SH(p_R11_L1HS,file="R11_L1HS.png")
 
 # 再生産関係にべバートンホルト型を指定、推定方法を最小二乗法とし（method="L2"））、2005年にレジームが切り替わり、b,sdがレジームで変更される場合
-resR1_L2BH <- fit.SRregime(SRdata, SR = "BH", method = "L2", regime.year = c(2005), regime.par = c("a","b","sd")[2:3], use.fit.SR = TRUE, regime.key = c(0, 1), bio_par=bio_par)
+resR1_L2BH <- fit.SRregime(SRdata_ex, SR = "BH", method = "L2", regime.year = c(2005), regime.par = c("a","b","sd")[2:3], use.fit.SR = TRUE, regime.key = c(0, 1), bio_par=bio_par)
 # 結果をテキストでファイル出力
 out.SR(resR1_L2BH,filename = "R1L2BH")
 # 推定結果をプロット
@@ -127,7 +127,7 @@ plot_SRregime(resR1_L2BH)
 SRregime_plot(resR1_L2BH, regime.name = c("A","B"))
 
 # 再生産関係にHockey-Stick型を指定、推定方法を最小絶対値法とし（method="L1"）、2005年、2010年にレジームが切り替わる場合
-resR2_L1HS <- fit.SRregime(SRdata, SR = "HS", method = "L1", regime.year = c(2005,2010), regime.par = c("a","b", "sd")[1:3], use.fit.SR = TRUE, regime.key = c(0, 1, 2), bio_par=bio_par)
+resR2_L1HS <- fit.SRregime(SRdata_ex, SR = "HS", method = "L1", regime.year = c(2005,2010), regime.par = c("a","b", "sd")[1:3], use.fit.SR = TRUE, regime.key = c(0, 1, 2), bio_par=bio_par)
 # 結果をテキストでファイル出力
 out.SR(resR2_L1HS,filename = "R2L1HS")
 # 推定結果をプロット

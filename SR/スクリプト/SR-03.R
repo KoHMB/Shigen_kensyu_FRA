@@ -42,14 +42,11 @@ prof.likSR(resL2RIARout1)
 prof.likSR(resL2BHARout0)
 
 # 残差の自己相関のチェック ----
-outer1HS = calc.residAR(resL1HS, output = TRUE, filename = "L1HSresidARouter")
-outer1HS
+outerL1HS = calc.residAR(resL1HS, output = TRUE, filename = "L1HSresidARouter")
+outerL1HS
 
 # 残差の自己相関をプロット
-autocor.plot(resL1HS) #デフォルトはuse.resid = 1
 autocor.plot(resL1HS, output = TRUE, filename = "L1HSdevianceAR")
-
-autocor.plot(resL1HS,use.resid = 2, output = TRUE, filename = "L1HSresidAR")
 
 # ブートストラップ解析(parametric) ----
 boot.resL1HS = boot.SR(resL1HS, n = 1000, method = "p")

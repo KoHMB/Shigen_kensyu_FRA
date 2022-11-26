@@ -19,12 +19,11 @@ plot(catch_data2$temp[which(catch_data2$vessel=="v1",)],catch_data2$catch[which(
 library(RColorBrewer)
 colPal3 <- colorRampPalette(brewer.pal(11, "Spectral"))
 col= colPal3(length(unique(catch_data2$area)))
-# 60本の線を入れるので時間がかかります
-for(i in 1:length(unique(catch_data2$area))){
+# 約60本の線を入れるので時間がかかります
+for(i in 1:(length(unique(catch_data2$area))-1)){
   par(new=T)
   plot(pred_catch_datav1$temp[which(pred_catch_datav1$area==i)],pred_catch_datav1$pred[which(pred_catch_datav1$area==i)],type="l",col=col[i],lwd=0.5,xlab="",ylab="",ylim=yrange,xlim=xrange)
 }
-
 
 # install glmmML
 # install.packages("glmmML")

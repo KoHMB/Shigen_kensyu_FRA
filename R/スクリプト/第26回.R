@@ -1,4 +1,4 @@
-# 第23回作成データの読み込みと確認
+# 第13回作成データの読み込みと確認
 load("res_lm_catch.rda")
 head(res_lm_catch)
 

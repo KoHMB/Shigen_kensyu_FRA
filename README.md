@@ -9,6 +9,7 @@
 - [Base](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/Base): 資源管理の基礎について
 - [Info](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/Info): 研修の補助資料
 - [R](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/R): R初心者講習
+- SSPM: spictを用いた状態空間モデルの実践
 - Tool: frasyrの開発・GitHubについて
 - [VPA](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/VPA): 資源評価モデルVPAについて
 - [MR](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/MR): 標識再捕法と遺伝情報の利活用について

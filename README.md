@@ -14,7 +14,7 @@
 - [VPA](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/VPA): 資源評価モデルVPAについて
 - [MR](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/MR): 標識再捕法と遺伝情報の利活用について
 - [SR](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/SR): 再生産関係推定について
-- [PM](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/PM): プロダクションモデルについて
+- [SSPM](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/SSPM): (状態空間)プロダクションモデルについて
 - [Type2](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/Type2): 2系資源の資源管理について
 
 

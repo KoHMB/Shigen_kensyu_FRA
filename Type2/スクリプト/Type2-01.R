@@ -41,3 +41,39 @@ abc2_aka_BT07<-calc_abc2(ccdata = data_aka,
 plot_hcr2(res.list = list(abc2_aka,abc2_aka_BT07),
           proposal = F,vline = T,vlineBan = T,
           hscale = "middle",hline = "dense")
+
+# 追加ルール ----
+# 迅速にデータが得られる場合A
+abc2_aka_timelag0a<-calc_abc2(ccdata = data_aka,
+                    BT = 0.6,
+                    tune.par = c(0.4,0.7,1.0),
+                    timelag0 = T)
+
+# 迅速にデータが得られる場合B
+data_aka2<-data_aka
+data_aka2$catch[nrow(data_aka2)]<-NA
+tail(data_aka2)
+#最終年catchがNAなので6年平均とすると、NAを考慮して5年平均する
+abc2_aka_timelag0b<-calc_abc2(ccdata = data_aka2,
+                              BT = 0.65,
+                              tune.par = c(0.5,0.7,1.0),
+                              timelag0 = T,
+                              n.catch = 6) 
+
+#n.catch=6を指定しているので、デフォルト設定だと「6年平均漁獲量」となってしまう
+graph2_aka_timelag0b<-plot_abc2(abc2_aka_timelag0b,latest_Catch_na = T)
+
+# 変動緩和の場合
+abc2_aka_resp04<-calc_abc2(ccdata = data_aka,
+                              tune.par = c(0.3,0.6,0.3),
+                              resp = 0.4)
+
+# 積極的な漁獲1
+abc2_aka_BT07<-calc_abc2(ccdata = data_aka,
+                         BT = 0.7,
+                         tune.par = c(0.4,0.7,1.0))
+
+# 積極的な漁獲2
+abc2_aka_BT065<-calc_abc2(ccdata = data_aka,
+                         BT = 0.65,
+                         tune.par = c(0.4,0.7,1.0))

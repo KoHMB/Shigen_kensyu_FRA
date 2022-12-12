@@ -28,7 +28,7 @@
 - 1) abchanのページから”ハイブリッド形式_配布資料”をダウンロードする【オススメ】  
 - 2) このGitHubをダウンロードする
   - 2-1) 本GitHubページの[トップ](https://github.com/KoHMB/Shigen_kensyu_FRA)に行く  
-  - 2-2) 画面真ん中より右上らへんの<span style="color: green; "> <>CODE </span>をクリック  
+  - 2-2) 画面真ん中より右上らへんの<span class="col-green"><>CODE</span>をクリック  
     ![緑色のCODEボタンの位置](z.others/fig1.png)   
   - 2-3) Download ZIPを選択  
     ![Download ZIP](z.others/fig2.png)  

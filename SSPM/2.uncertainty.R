@@ -29,20 +29,24 @@ set.seed(19001205)
 
 ## 設定----
 sigi_true <- 0.4
-oe_true <- rnorm(Time, -0.5*sigi_true^2, sigi_true)
+oe_true <- rnorm(50, -0.5*sigi_true^2, sigi_true)
+### ここで乱数を戻す 
 set.seed(1)
-sigb_true <- 0.2
-pe_true <- rnorm(Time, -0.5*sigb_true^2, sigb_true)
+sigb_true <- 0.4
+pe_true <- rnorm(50, -0.5*sigb_true^2, sigb_true)
+df_true <- read.csv("pm_true.csv", header = TRUE)
+source("function.R", encoding = "utf-8")
+
 
 ## 真の資源動態の生成----
-Bt_true <- numeric(Time)
-Bt_true[1] <- K_true
-for(t in 2:Time){
+Bt_true <- numeric(50)
+Bt_true[1] <- 10000
+for(t in 2:50){
   Bt_true[t] <- PM_func(Bt = Bt_true[t-1],
-                        r  = r_true,
-                        K  = K_true,
-                        n  = n_true,
-                        Ft = Ft_true[t-1],
+                        r  = 0.5,
+                        K  = 10000,
+                        n  = 2,
+                        Ft = df_true$F[t-1],
                         pe = pe_true[t-1])
 }
 df_true <- df_true %>% mutate(Bt_true = Bt_true)
@@ -51,7 +55,7 @@ ggplot(data = df_true)+
   ylim(0,NA)
 
 ## 漁獲量とCPUEデータの生成----
-cpue <- q_true*Bt_true*exp(oe_true)
+cpue <- 0.01*Bt_true*exp(oe_true)
 df_true <- df_true %>% mutate(cpue = cpue) %>% 
   mutate(catch = F*Bt_true)
 
@@ -63,14 +67,14 @@ df_true <- df_true %>% mutate(cpue = cpue) %>%
 # SPiCTによる資源解析----
 
 ## データの作成 ----
-data_test <- list(timeC = df_true$Year,
-                  obsC  = df_true$catch,
-                  timeI = df_true$Year,
-                  obsI  = df_true$cpue
-                  )
+data_test2 <- list(timeC = df_true$Year,
+                   obsC  = df_true$catch,
+                   timeI = df_true$Year,
+                   obsI  = df_true$cpue
+)
 
 ## データのプロット
-plotspict.ci(data_test)
+plotspict.ci(data_test2)
 ### あなたのCPUEはどんなトレンドでしょうか？
 
 

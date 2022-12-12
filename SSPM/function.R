@@ -1,3 +1,9 @@
+PM_func <- function(Bt, r, K, n, Ft, pe){
+  B_next <- (Bt + r/(n-1)*Bt*(1-(Bt/K)^(n-1)) - Ft*Bt)*exp(pe)
+  return(max(B_next, 100))
+}
+
+
 plot_barbiomass <- function(res, with_biomass=TRUE){
   
   Bmsy <- get.par("Bmsy",res)[2]

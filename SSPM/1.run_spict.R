@@ -141,7 +141,7 @@ df_Best <- df_true %>% select("Year", "Biomass") %>%
 df_Best$name <- factor(df_Best$name, levels=c("true","est"))
 ggplot(df_Best,
        aes(x = Year, y = Biomass, linetype = name, color = name))+
-  geom_line(linewidth = 2)+
+  geom_line(size = 2)+
   ylab("資源量")+ylim(0,NA)
   
 
@@ -181,23 +181,49 @@ res_plot #要因分解プロットのggplotオブジェクトを描画
 
 
 
-#########################################################
-# 設定を変更して再解析----
+########################################################
+##
+## 以下、12月16日の研修会で加筆実行したコードです
+## 事前分布の設定を変更して再解析----
+##
 
-## 事前分布の設定 ----
-names(input$priors)
+input$priors$logalpha <- c(log(1), 0.5, 1)
+input$priors$logbeta <- c(log(1),1,0)
+input$priors$logsdc <- c(log(0.01), 1e-3, 1)
 input$priors$logn <- c(log(2), 0.5, 1)
 input$priors$logr <- c(log(0.5), 0.5, 1)
+input$priors$logK <- c(log(10000), 0.5, 1)
+input$priors$logq <- c(log(0.001), 0.5, 1)
 
-
-## spictで推定
-res1 <- fit.spict(input)
+library(spict)
+res1 <-  fit.spict(input)
 summary(res1)
-### 最初の設定は無情報事前分布である
+plotspict.priors(res1)
 
-## モデル診断
-res_diag <- calc.osa.resid(res1)
-plotspict.diagnostic(res_diag)
+res1$opt$convergence
+all(is.finite(res1$sd))
+calc.om(res1) #戻り値のmagnitudeが1 以下ならばOK
+
+options(max.print = 1e+05)
+fit <- check.ini(res1, ntrials = 10)
+fit$check.ini$inimat 
+fit$check.ini$resmat
+
+plot(res1)
+
+res_resi <- calc.osa.resid(res1)
+plotspict.diagnostic(res_resi)
+
+
+res_retro <- retro(res1, nretroyear = 5)　
+plotspict.retro(res_retro)
+plotspict.retro.fixed(res_retro)
+mohns_rho(res_retro, what = c("FFmsy", "BBmsy", "B", "F"))
+
+library(tidyverse)
+source("function.R", encoding = "utf-8")
+res_plot <- plot_barbiomass(res = res1)
+res_plot 
 
 
 ## 結果のプロット ----
@@ -215,12 +241,5 @@ df_Best_1_2 <- df_true %>% select("Year", "Biomass") %>%
   pivot_longer(cols = -"Year", values_to = "Biomass")
 df_Best_1_2$name <- factor(df_Best_1_2$name, levels=c("true","estB1","estB2"))
 ggplot(df_Best_1_2, aes(x=Year, y=Biomass, linetype = name, color = name))+
-  geom_line(linewidth = 2)+
+  geom_line(size = 2)+
   ylab("資源量")
-
-
-
-
-
-
-

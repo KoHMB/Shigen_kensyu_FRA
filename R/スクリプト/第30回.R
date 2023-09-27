@@ -1,14 +1,14 @@
 # install glmmTMB
 # install.packages("glmmTMB")
 
-catch_data3 <- read.csv("catch_data3.csv")
+catch_data2 <- read.csv("catch_data2.csv")
 # glmmMLの推定結果とglmmTMBの結果の比較
 library(glmmML)
-res_glmm_catch <- glmmML(catch~vessel+temp,family = poisson(link = "log"), data = catch_data3, cluster = as.factor(area))
+res_glmm_catch <- glmmML(catch~vessel+temp,family = poisson(link = "log"), data = catch_data2, cluster = as.factor(area))
 summary(res_glmm_catch)
 
 library(glmmTMB)
-res_glmm_catch2 <- glmmTMB(catch~vessel+temp+(1|area), data = catch_data3,family = poisson(link = "log"))
+res_glmm_catch2 <- glmmTMB(catch~vessel+temp+(1|area), data = catch_data2,family = poisson(link = "log"))
 summary(res_glmm_catch2)
 # 固定効果はおおよそ同じ（ランダム効果の分散推定結果はちょっと違う）
 

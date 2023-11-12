@@ -25,7 +25,7 @@ summary(binom_cpue_best)
 
 # ２段階目はキャッチがあったデータのみデータを対象にするので抽出
 positive_cpue_data <- subset(cpue_data_incldzero, cpue_data_incldzero$cpue> 0); nrow(positive_cpue_data)
-# 目的変数をcpueとして誤差分布をガンマ分布、リンク関数をlogでGLM
+# 目的変数をcpueとして誤差構造をガンマ分布、リンク関数をlogでGLM
 gamma_cpue_full <- glm(cpue ~ as.factor(year)+lon+lat+I(lon^2)+I(lat^2)+lon:lat-1,family = Gamma(link = "log"), data = positive_cpue_data)
 summary(gamma_cpue_full)
 

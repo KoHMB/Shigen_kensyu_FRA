@@ -1,4 +1,4 @@
-# 解析するデータは第32回と同じ
+# 解析するデータは第34回と同じ
 head(FishTrait_pca)
 nrow(FishTrait_pca)
 

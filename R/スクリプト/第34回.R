@@ -1,5 +1,5 @@
 # データ読み込み
-FishTrait2 <- read.csv("FishBodyTraitData2.csv",row.names = 1)
+FishTrait2 <- read.csv("FishBodyTraitData2.csv")
 
 # データを眺める
 View(FishTrait2) # ID、種、尾ビレの形以外の数値は全長に対する比
@@ -10,10 +10,14 @@ FishTrait2$ratio.Fork.length<-ifelse(is.na(FishTrait2$ratio.Fork.length),1,FishT
 # PCAは数値データが対象なので、種名と尾ビレの形を除いて解析
 FishTrait_pca <- FishTrait2[,-c(1,2,8)]
 row.names(FishTrait_pca) <- FishTrait2[,c(1)]
+
+# データ読み込み時に一列目データをIDにすることもできる
+# FishTrait2 <- read.csv("FishBodyTraitData2.csv",row.names=1)
+# FishTrait2$ratio.Fork.length<-ifelse(is.na(FishTrait2$ratio.Fork.length),1,FishTrait2$ratio.Fork.length)
+# FishTrait_pca <- FishTrait2[,-c(1,7)]
+
 # 各数値は大きさがバラバラで同じ基準で分散を比べられないのでscale=Tとする
 res_pca<-prcomp(FishTrait_pca,scale=T)
-
-names(res_pca)
 
 #各主成分の標準偏差との各変数からの重み（合成ベクトル）
 print(res_pca)
@@ -27,4 +31,3 @@ plot(res_pca)
 # 第１主成分と第２主成分を軸に取り、各変数のベクトルとデータを表示
 # par(family="HiraginoSans-W3") # Macだと日本語が文字化けするのでフォント指定
 biplot(res_pca)
-biplot(res_pca,scale=0) #　主成分を標準化をせずに表示

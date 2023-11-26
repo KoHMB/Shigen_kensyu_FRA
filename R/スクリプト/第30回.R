@@ -10,7 +10,7 @@ summary(res_glmm_catch)
 library(glmmTMB)
 res_glmm_catch2 <- glmmTMB(catch~vessel+temp+(1|area), data = catch_data2,family = poisson(link = "log"))
 summary(res_glmm_catch2)
-# 固定効果はおおよそ同じ（ランダム効果の分散推定結果はちょっと違う）
+# 推定値はおおよそ同じ
 
 cpue_data3 <- read.csv("cpuestandardization3.csv")
 # データの中身確認
@@ -29,25 +29,24 @@ nominal_cpue2<-tapply(cpue_data3$cpue, cpue_data3$year, mean)
 par(new=T)
 plot(sort(unique(cpue_data3$year)),nominal_cpue2,col="red")
 
-# 船IDをランダム効果にしてglm
+# 船IDをランダム効果にしてglmm
 res_glmm_cpue <- glmmTMB(cpue~as.factor(year)+lon+lat+I(lon^2)+I(lat^2)+(1|vessel_id), data = cpue_data3,family = Gamma(link = "log"))
 summary(res_glmm_cpue)
 
 # 予測データセットを作成し、stdCPUEを算出してみる
 pred_data <- expand.grid(year=sort(unique(cpue_data3$year)),lon=seq(min(cpue_data3$lon),max(cpue_data3$lon),length=20),lat=seq(min(cpue_data3$lat),max(cpue_data3$lat),length=20),vessel_id=sort(unique(cpue_data3$vessel_id)))
 head(pred_data)
+tail(pred_data)
 nrow(pred_data)
 pred_data <- cbind(pred_data,cpue=predict(res_glmm_cpue,newdata = pred_data,type = "response"))
 head(pred_data)
-hist(pred_data$cpue)
-
 std_cpue<-tapply(pred_data$cpue, pred_data$year, mean)
 
 plot(sort(unique(cpue_data3$year)),nominal_cpue,ylim=c(min(nominal_cpue,std_cpue),max(nominal_cpue,std_cpue)),xlab="year",ylab="cpue")
 par(new=T)
 plot(sort(unique(cpue_data3$year)),std_cpue,col="red",ylim=c(min(nominal_cpue,std_cpue),max(nominal_cpue,std_cpue)),xlab="",ylab="")
 
-# simulate関数で1000個のcatchを作成
+# simulate関数で1000個のcpueを作成
 res_sim=simulate(res_glmm_cpue,seed=1,nsim=1000)
 # listで作成されるので、sim num=1 のcpueを確認（cpue_data3の行数のcpue）
 res_sim[[1]]
@@ -65,7 +64,9 @@ names(std_cpues)<-c("simID_0")
 head(std_cpues)
 res_glmm_cpue_sim<-list()
 
-load("./res_glmm_cpue_sim.rda")
+load("./std_cpues.rda") # このデータ(1000回)をロードしたら2行下の
+    #for文をスキップしてhead(std_cpues)で確認してください
+load("./res_glmm_cpue_sim100.rda") # これは73行目のglmmTMBの戻り値(100回)
 for(i in 1:100){ # 1000回は時間がかかるのでここでは100でやめておく
   cpue_data_sim<-data.frame(cpue_sim=res_sim[[i]],cpue_data3)
 
@@ -79,14 +80,16 @@ for(i in 1:100){ # 1000回は時間がかかるのでここでは100でやめて
 }
 head(std_cpues)
 #save(res_glmm_cpue_sim,file="res_glmm_cpue_sim.rda")
+#save(std_cpues,file="std_cpues.rda")
 
 # 各年ごとに平均、中央値、標準偏差、95％CIを計算する
 mean(as.numeric(std_cpues[1,]))
 apply(std_cpues,1,mean)
 apply(std_cpues,1,function(x){quantile(x,probs=0.025)})
+#apply(std_cpues,1,quantile,probs=0.025) #この書き方でも良い
 
 head(std_cpues)
-# bootID_0はbootstrapではないので、summaryの計算からは除く
+# simID_0はbootstrapではないので、summaryの計算からは除く
 summary_sim_cpue <- data.frame(mean=apply(std_cpues[,-1],1,mean)
 ,median=apply(std_cpues[,-1],1,median),CI95lower=apply(std_cpues[,-1],1,function(x){quantile(x,probs=0.025)}),CI95upper=apply(std_cpues[,-1],1,function(x){quantile(x,probs=0.975)}))
 summary_sim_cpue$year <-row.names(summary_sim_cpue)
@@ -159,6 +162,8 @@ yrange<-c(min(nominal_cpue,std_cpue),max(nominal_cpue,std_cpue))
 plot(sort(unique(cpue_data3$year)),nominal_cpue,ylim=yrange,xlab="year",ylab="cpue")
 par(new=T)
 plot(sort(unique(cpue_data3$year)),std_cpue,col="blue",ylim=yrange,xlab="",ylab="")
+par(new=T)
+plot(summary_boot_cpue$year,summary_boot_cpue$median,col="blue",type="l",lty=1,ylim=yrange,xlab="",ylab="")
 par(new=T)
 plot(summary_boot_cpue$year,summary_boot_cpue$CI95lower,col="blue",type="l",lty=2,ylim=yrange,xlab="",ylab="")
 par(new=T)

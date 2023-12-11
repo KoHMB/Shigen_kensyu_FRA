@@ -1,0 +1,30 @@
+資源管理研修（ハイブリッド）へ参加予定の皆さま、
+
+今週木・金に開催される上記研修会に先立ちまして、参加予定の皆さま方には、講習で使うRパッケージのインストールを事前にお願いいたします。
+
+まず、以下のコマンドより関連ライブラリのインストールをおこなってください。
+installl.packages("tidyverse")
+
+次に、機構で配布しているRパッケージ（frasyr）をインストールします。frasyrのインストールには以下の2つの方法があります。どちらか、やりやすい方法でインストールください。
+
+方法① githubからのインストール
+添付資料「Rと関連ソフトのインストール手順」に詳細があります。この資料はfrapmrのインストール手順となっていますが、ここをfrasyrを読み替えてインストールをお願いします。以下、大まかな流れです。
+1. RtoolsをPCにインストール
+2. install.packages("devtools")コマンドによりdevtoolsをRにインストール
+3. devtools::install_github("ichimomo/frasyr@dev")コマンドによりfrasyrをインストール
+資源管理研修動画（Github入門ガイド第3回）https://www.youtube.com/watch?v=0TOtIzg0jR0　の前半部分でもinstall_githubを利用したfrasyrのインストール方法が載っています
+
+方法② tar.gzファイルからのインストール
+もし上記の方法でうまくいかない場合には、こちらの方法をお試しください。ただし、こちらの方法は配布されているバージョンが固定されており、frasryが更新された場合には、再度tar.gzの配布を受ける必要があります。
+1. 資源管理研修のHPで配布しているfrasyr_XXXX.tar.gzファイルをダウンロード
+2. RStudioの「Tools」タブの「Install Packages...」を選択。一番上のプルダウンメニュー(Install from)で「Package Archive File (.zip; .tar.gz)」を選択。
+3. ファイル選択画面に遷移するので(1)でダウンロードしたファイルを選択
+
+また、既にdevtoolsをインストールしている人、普段frasyrを利用されている方は以下の手順は不要です。
+> library(devtools)
+というコマンドを打って、"devtools"がありません、というエラーが出ない場合には、
+devtools::install_github("ichimomo/frasyr")
+で、frasyrのインストールにお進みください。普段frasyrを使っている人も、上記のコマンドより、frasyrを最新版に更新しておいてください。
+
+
+

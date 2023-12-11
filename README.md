@@ -14,10 +14,12 @@
 - [MR](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/MR): 標識再捕法と遺伝情報の利活用について
 - [SR](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/SR): 再生産関係推定について
 - [SSPM](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/SSPM): spictを用いた状態空間モデルの実践
+- [Type1A](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/Type1A): 1A系資源の資源評価計算・将来予測について
 - [Type2](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/Type2): 2系資源の資源管理について
 
 
 ## 更新
+- (2023/12/11) Type1Aのページを更新しました
 - (2022/12/11) 2023年度資源管理研修会用のページに更新しました
 - (2023/12/11) VPAのページを更新しました
 - (2023/11/27) Rのページを更新しました
@@ -37,6 +39,7 @@
 
 ## 2023年度配布ファイル
 
+- [frasyrによる1A系資源評価と将来予測](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/Type1A/)
 - [frasyrによるRidge-VPA解析](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/VPA/vpa_11_data_code/vpa-11/)
 - [R初心者講習 CPUE標準化その３用データ、デルタ2段階法用データ、ロジスティック回帰・多変量解析用データ](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/R)
 

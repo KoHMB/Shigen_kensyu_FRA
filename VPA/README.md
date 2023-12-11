@@ -16,7 +16,6 @@ Virtual Population Analysis(VPA)は我が国で用いられる資源評価手法
 
 - データを用いたRidge-VPA解析の説明を行いました
 - 動画のURLはabchanかTeamsのURLからアクセスしてください
-- 動画中で利用したスクリプトは[こちら](https://github.com/KoHMB/Shigen_kensyu_FRA/blob/main/VPA/vpa_11_code_data/vpa-11/VPA-11_script.R)
-
+- 動画中で利用したスクリプトは[こちら](https://github.com/KoHMB/Shigen_kensyu_FRA/blob/main/VPA/vpa_11_data_code/vpa-11/VPA-11_script.R)
 
 

@@ -37,7 +37,7 @@
 
 ## 2023年度配布ファイル
 
-- [frasyrによるRidge-VPA解析](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/VPA/vpa_11_code_data)
+- [frasyrによるRidge-VPA解析](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/VPA/vpa_11_data_code/vpa-11/)
 - [R初心者講習 CPUE標準化その３用データ、デルタ2段階法用データ、ロジスティック回帰・多変量解析用データ](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/R)
 
 ## 2022年度配布ファイル

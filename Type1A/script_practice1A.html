@@ -352,7 +352,7 @@ pre code {
 
 <div id="rを用いた1a系資源の解析演習" class="section level1">
 <h1>Rを用いた1A系資源の解析演習</h1>
-<p>Rスクリプトを使って1A系資源の解析を実感しましょう。個々の演習課題を実施してください。下についているRコードは「ヒント」です。</p>
+<p>Rスクリプトを使って1A系資源の解析を実感しましょう。個々の演習課題を実施してください。下についているRコードは「ヒント」です。<strong>[難]</strong>のマークがついているものは、スクリプトの変更や、考察が必要な難しい問題です。</p>
 <div id="事前準備" class="section level2">
 <h2>事前準備</h2>
 <ul>
@@ -396,7 +396,8 @@ dir()</code></pre>
 <ul>
 <li>配布データされたcsvファイルを読み込んでVPAを一回実行してみてください</li>
 </ul>
-<pre class="r"><code>#setwd(&quot;c:/Users/00006909/kenshu2023&quot;)
+<pre class="r"><code># ワーキングディレクトリを設定
+#setwd(&quot;c:/Users/00006909/kenshu2023&quot;)
 library(frasyr)
 library(tidyverse)
 library(patchwork)
@@ -420,9 +421,9 @@ res_vpa &lt;- vpa(dat_vpa) # 引数をつけないで実行＝デフォルト引
 <li>どんなデータか確認しよう</li>
 <li>いろいろなVPAの設定を試して、結果を比較しよう</li>
 </ul>
-<pre class="r"><code>#dat_vpa &lt;- readRDS(&quot;dat_vpa2.rds&quot;) 
-#dat_vpa &lt;- readRDS(&quot;dat_vpa2.rds&quot;)
-dat_vpa &lt;- readRDS(&quot;dat_vpa3.rds&quot;)
+<pre class="r"><code>dat_vpa &lt;- readRDS(&quot;dat_vpa1.rds&quot;) 
+#dat_vpa &lt;- readRDS(&quot;dat_vpa2.rds&quot;) # 以下、演習問題で使う別のデータです
+#dat_vpa &lt;- readRDS(&quot;dat_vpa3.rds&quot;)
 #dat_vpa &lt;- readRDS(&quot;dat_vpa4.rds&quot;)
 
 # データの確認
@@ -499,11 +500,11 @@ res_ref4045$summary
 aa &lt;- get.SPR(res_vpa_su)
 plot(aa$ysdata$perSPR)</code></pre>
 </div>
-<div id="演習⑦-どのチューニング手法がおすすめか判断しよう-fish" class="section level3">
-<h3>演習⑦ どのチューニング手法がおすすめか、判断しよう :fish:</h3>
+<div id="演習⑦-どのチューニング手法がおすすめか判断しよう-難" class="section level3">
+<h3>演習⑦ どのチューニング手法がおすすめか、判断しよう <strong>[難]</strong></h3>
 <ul>
-<li>dat1.rdsから推定される3つのVPA結果のうち、どの結果が一番「良い」だろうか？その根拠は？</li>
-<li>別データ（dat2.rds）でも同様の解析を行って、dat2.rdsの場合にはどの手法が一番良いか考えよう</li>
+<li>dat1.rdsから推定される3つのVPA結果のうち、どの結果が一番「良い」だろうか？その根拠は？<strong>[難]</strong></li>
+<li>別データ（dat2.rds）でも同様の解析を行って、dat2.rdsの場合にはどの手法が一番良いか考えよう<strong>[難]</strong></li>
 </ul>
 </div>
 </div>
@@ -513,9 +514,9 @@ plot(aa$ysdata$perSPR)</code></pre>
 <h3>演習⑧ 再生産関係のあてはめと選択</h3>
 <ul>
 <li>dat1.rdsの選択率更新法の結果を用いて再生産関係の推定を行ってみよう</li>
-<li>再生産ガイドラインに沿うと、HS, RI, BHのうちどの再生産関係を選ぶのが適切だろうか？:fish:</li>
-<li>再生産関係の選択によって、過去の資源のトレンドや資源状態がどのように説明できるようになるだろうか？:fish:</li>
-<li>dat3.rdaデータについても同様の解析を行い、dat1.rdsの結果と比較してみよう:fish:</li>
+<li>再生産ガイドラインに沿うと、HS, RI, BHのうちどの再生産関係を選ぶのが適切だろうか？<strong>[難]</strong></li>
+<li>再生産関係の選択によって、過去の資源のトレンドや資源状態がどのように説明できるようになるだろうか？<strong>[難]</strong></li>
+<li>dat3.rdaデータについても同様の解析を行い、dat1.rdsの結果と比較してみよう<strong>[難]</strong></li>
 </ul>
 <pre class="r"><code># hの計算に必要な生物パラメータの取り出し
 
@@ -537,18 +538,15 @@ res_SR_HS  &lt;- fit.SR(data_SR_su, SR=&quot;HS&quot;, method=&quot;L2&quot;, AR
      geom_vline(xintercept=res_SR_HS$steepness$SB0/1000, col=&quot;green&quot;) +
      xlim(0, res_SR_BH$steepness$SB0/1000*1.2)) </code></pre>
 </div>
-</div>
-<div id="c.-疑似データを使った1系資源の解析将来予測" class="section level2">
-<h2>C. 疑似データを使った1系資源の解析（将来予測）</h2>
 <div id="演習⑨-将来予測をやってみよう" class="section level3">
 <h3>演習⑨ 将来予測をやってみよう</h3>
 <ul>
 <li>以下のコマンドを実行し、将来予測〜結果のプロット〜神戸プロットの描画までを体験してみよう</li>
-<li>dat3.rds、dat4.rdsについても将来予測をやってみよう。それぞれどのような特徴があるだろうか？:fish:</li>
+<li>dat3.rds、dat4.rdsについても将来予測をやってみよう。それぞれどのような特徴があるだろうか？<strong>[難]</strong></li>
 </ul>
 <pre class="r"><code>currentF &lt;- as.numeric(unlist(res_vpa_su$faa))
 
-data_future2 &lt;- make_future_data(res_vpa_su, nsim=100, nyear=30,
+data_future &lt;- make_future_data(res_vpa_su, nsim=100, nyear=30,
                  future_initial_year_name=50, start_F_year_name=51,
                  start_biopar_year_name=51, start_random_rec_year_name=51,
                  currentF=F4850,
@@ -556,21 +554,52 @@ data_future2 &lt;- make_future_data(res_vpa_su, nsim=100, nyear=30,
                  waa_year=49:50, waa_catch_year=49:50, maa_year=49:50,
                  M_year=49:50,
                  faa_year=NULL, start_ABC_year_name=52,res_SR=res_SR_HS)
-res_MSYRP &lt;- est_MSYRP(data_future2)
-res_MSYRP$summary
+res_MSY &lt;- est_MSYRP(data_future)
+res_MSY$summary
 
-res_future2_msy &lt;- future_vpa(data_future2$data, multi_init=res_MSYRP$summary$Fref2Fcurrent[1])
+SPRmsy   &lt;- res_MSY$summary$perSPR[1]
+Fmsy     &lt;- res_MSY$Fvector[1,] %&gt;% as.numeric()
+SBlimit  &lt;- res_MSY$summary$SSB[4]
+SBban    &lt;- res_MSY$summary$SSB[3]
+SBtarget &lt;- res_MSY$summary$SSB[1]
 
-plot_futures(res_vpa_su,list(res_future2_msy), Btarget=res_MSYRP$summary$SSB[1])
+# make_data_futureのHCR関係の引数をMSYベースのものに変更する
+data_future_msy &lt;- redo_future(data_future,
+                               input_data_list=list(futureF=Fmsy, HCR_Bban=SBban,
+                                                    HCR_beta=0.8, HCR_Blimit=SBlimit),
+                               only_data=TRUE)
+res_future_msy &lt;- future_vpa(data_future_msy$data, multi_init=1,
+                             calc_SPR_year_name=as.character(1:100),
+                             SPRtarget=SPR_msy*100)
+
+plot_futures(res_vpa_su,list(res_future_msy), Btarget=res_MSY$summary$SSB[1],
+             what.plot=c(&quot;Recruitment&quot;, &quot;SSB&quot;, &quot;biomass&quot;,&quot;catch&quot;, &quot;U&quot;, &quot;Fratio&quot;))
 
 # 神戸プロット
-kobe_ratio &lt;- get.SPR(res_vpa_su, target.SPR=res_MSYRP$summary$perSPR[1]*100)$ysdata %&gt;%
-    mutate(Bratio=unlist(colSums(res_vpa_su$ssb))/res_MSYRP$summary$SSB[1])%&gt;%
+kobe_ratio &lt;- get.SPR(res_vpa_su, target.SPR=res_MSY$summary$perSPR[1]*100)$ysdata %&gt;%
+    mutate(Bratio=unlist(colSums(res_vpa_su$ssb))/res_MSY$summary$SSB[1])%&gt;%
     mutate(Fratio=get(&quot;F/Ftarget&quot;)) %&gt;%
     mutate(year=as.numeric(colnames(res_vpa_su$faa)))
 
 plot_kobe_gg(FBdata=kobe_ratio,
              refs_base=res_MSYRP$summary)</code></pre>
+</div>
+<div id="演習10-将来予測でabcの不確実性を考慮してみよう難" class="section level3">
+<h3>演習10 将来予測でABCの不確実性を考慮してみよう<strong>[難]</strong></h3>
+<ul>
+<li>通常の将来予測res_future_msyの結果とどこが違うだろうか？</li>
+<li>dat1.rdsとdat4.rdsでどのように違うだろうか？その理由は？</li>
+</ul>
+<pre class="r"><code># 引数を変えてdata_futureを作り直す（時間がかかるため、計算回数を減らす）
+data_future_mse &lt;- redo_future(data_future_msy, input_data_list=list(nsim=50, nyear=10),
+                               only_data=TRUE)
+# do_MSEのオプションをTRUEにしてMSEモードにする
+res_future_mse &lt;- future_vpa(data_future_mse$data,
+                             multi_init=res_MSYRP$summary$Fref2Fcurrent[1],
+                             do_MSE=TRUE,MSE_input_data=data_future_mse,
+                             calc_SPR_year_name=as.character(1:100), SPRtarget=SPR_msy*100)
+plot_futures(res_vpa_su, lst(res_future_mse, res_future_msy),
+             what.plot=c(&quot;Recruitment&quot;, &quot;SSB&quot;, &quot;biomass&quot;,&quot;catch&quot;, &quot;U&quot;, &quot;Fratio&quot;))</code></pre>
 </div>
 </div>
 </div>

@@ -228,7 +228,7 @@ C. 疑似データを使った1系資源の解析（再生産関係の推定）
                                    only_data=TRUE)
     res_future_msy <- future_vpa(data_future_msy$data, multi_init=1,
                                  calc_SPR_year_name=as.character(1:100),
-                                 SPRtarget=SPR_msy*100)
+                                 SPRtarget=SPRmsy*100)
 
     plot_futures(res_vpa_su,list(res_future_msy), Btarget=res_MSY$summary$SSB[1],
                  what.plot=c("Recruitment", "SSB", "biomass","catch", "U", "Fratio"))
@@ -240,7 +240,7 @@ C. 疑似データを使った1系資源の解析（再生産関係の推定）
         mutate(year=as.numeric(colnames(res_vpa_su$faa)))
 
     plot_kobe_gg(FBdata=kobe_ratio,
-                 refs_base=res_MSYRP$summary)
+                 refs_base=res_MSY$summary)
 
 ### 演習10 将来予測でABCの不確実性を考慮してみよう**\[難\]**
 
@@ -254,8 +254,8 @@ C. 疑似データを使った1系資源の解析（再生産関係の推定）
                                    only_data=TRUE)
     # do_MSEのオプションをTRUEにしてMSEモードにする
     res_future_mse <- future_vpa(data_future_mse$data,
-                                 multi_init=res_MSYRP$summary$Fref2Fcurrent[1],
+                                 multi_init=res_MSY$summary$Fref2Fcurrent[1],
                                  do_MSE=TRUE,MSE_input_data=data_future_mse,
-                                 calc_SPR_year_name=as.character(1:100), SPRtarget=SPR_msy*100)
+                                 calc_SPR_year_name=as.character(1:100), SPRtarget=SPRmsy*100)
     plot_futures(res_vpa_su, lst(res_future_mse, res_future_msy),
                  what.plot=c("Recruitment", "SSB", "biomass","catch", "U", "Fratio"))

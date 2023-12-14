@@ -1,6 +1,3 @@
-Rを用いた1A系資源の解析演習
-===========================
-
 Rスクリプトを使って1A系資源の解析を実感しましょう。個々の演習課題を実施してください。下についているRコードは「ヒント」です。**\[難\]**のマークがついているものは、スクリプトの変更や、考察が必要な難しい問題です。
 
 事前準備
@@ -11,11 +8,11 @@ Rスクリプトを使って1A系資源の解析を実感しましょう。個�
 
 <!-- -->
 
-    install.packages("devtools") # Windowsの人はdevtoolsをインストールするさいにはRtools（https://cran.r-project.org/bin/windows/Rtools/）のインストールが必要です
-    install.packages("tidyverse")
+    #install.packages("devtools") # Windowsの人はdevtoolsをインストールするさいにはRtools（https://cran.r-project.org/bin/windows/Rtools/）のインストールが必要です
+    #install.packages("tidyverse")
     #devtools::install_github("ichimomo/frasyr")
 
-B1. 基礎知識編
+D. Rの基礎知識
 --------------
 
 ### 演習① Rに慣れよう
@@ -41,7 +38,7 @@ Rを使って以下の計算をしたり、グラフを書いたりしましょ�
     # ファイルがちゃんとおいてあるか確認
     dir()
 
-D. データを用いた演習
+E. データを用いた演習
 ---------------------
 
 ### 演習③ データを読み込んでVPAを一回実行しよう
@@ -133,6 +130,7 @@ D. データを用いた演習
               res_retro_fa$mohn_rho)
 
     # ブートストラップ
+    set.seed(1)
     res_boot_su <- plot_resboot_vpa(res_vpa_su, B_ite=30)
     res_boot_fa <- plot_resboot_vpa(res_vpa_fa, B_ite=30)
 
@@ -161,9 +159,6 @@ D. データを用いた演習
 
 -   dat1.rdsから推定される3つのVPA結果のうち、どの結果が一番「良い」だろうか？その根拠は？**\[難\]**
 -   別データ（dat2.rds）でも同様の解析を行って、dat2.rdsの場合にはどの手法が一番良いか考えよう**\[難\]**
-
-C. 疑似データを使った1系資源の解析（再生産関係の推定）
-------------------------------------------------------
 
 ### 演習⑧ 再生産関係のあてはめと選択
 
@@ -228,7 +223,7 @@ C. 疑似データを使った1系資源の解析（再生産関係の推定）
                                    only_data=TRUE)
     res_future_msy <- future_vpa(data_future_msy$data, multi_init=1,
                                  calc_SPR_year_name=as.character(1:100),
-                                 SPRtarget=SPR_msy*100)
+                                 SPRtarget=SPRmsy*100)
 
     plot_futures(res_vpa_su,list(res_future_msy), Btarget=res_MSY$summary$SSB[1],
                  what.plot=c("Recruitment", "SSB", "biomass","catch", "U", "Fratio"))
@@ -240,7 +235,7 @@ C. 疑似データを使った1系資源の解析（再生産関係の推定）
         mutate(year=as.numeric(colnames(res_vpa_su$faa)))
 
     plot_kobe_gg(FBdata=kobe_ratio,
-                 refs_base=res_MSYRP$summary)
+                 refs_base=res_MSY$summary)
 
 ### 演習10 将来予測でABCの不確実性を考慮してみよう**\[難\]**
 
@@ -254,8 +249,8 @@ C. 疑似データを使った1系資源の解析（再生産関係の推定）
                                    only_data=TRUE)
     # do_MSEのオプションをTRUEにしてMSEモードにする
     res_future_mse <- future_vpa(data_future_mse$data,
-                                 multi_init=res_MSYRP$summary$Fref2Fcurrent[1],
+                                 multi_init=res_MSY$summary$Fref2Fcurrent[1],
                                  do_MSE=TRUE,MSE_input_data=data_future_mse,
-                                 calc_SPR_year_name=as.character(1:100), SPRtarget=SPR_msy*100)
+                                 calc_SPR_year_name=as.character(1:100), SPRtarget=SPRmsy*100)
     plot_futures(res_vpa_su, lst(res_future_mse, res_future_msy),
                  what.plot=c("Recruitment", "SSB", "biomass","catch", "U", "Fratio"))

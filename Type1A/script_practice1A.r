@@ -33,6 +33,14 @@
 #' 4. histの引数を使ってみましょう
 #' 
 
+help(sum)
+sumtest1 <- sum(c(1,2,3,4,5,6,7,8,9,10))
+x1 <- rnorm(n=100)
+x2 <- rnorm(n=100, mean=100, sd=10)
+
+hist(x2)
+hist(x1, nclass=20)
+
 #+
 
 #' ### 演習② ワーキングディレクトリを使いこなそう
@@ -45,7 +53,7 @@
 
 #+
 
-#setwd("c:/Users/00006909/kenshu2023")
+setwd("c:/Users/00006909/git/Shigen_kensyu_FRA/Type1A") # 自分の環境に合わせて変更してください
 # ワーキングディレクトリが設定できたか確認
 getwd()
 # ファイルがちゃんとおいてあるか確認
@@ -61,7 +69,7 @@ dir()
 #+
 
 # ワーキングディレクトリを設定
-#setwd("c:/Users/00006909/kenshu2023")
+setwd("c:/Users/00006909/git/Shigen_kensyu_FRA/Type1A")
 library(frasyr)
 library(tidyverse)
 library(patchwork)
@@ -77,6 +85,27 @@ maa   <- read.csv("ex1_maa.csv",  row.names=1)
 index   <- read.csv("ex1_index.csv",  row.names=1)
 dat_vpa <- data.handler(caa=caa, waa=waa, maa=maa, M=0.5, index=index)
 res_vpa <- vpa(dat_vpa) # 引数をつけないで実行＝デフォルト引数が使われる
+
+# namesという関数を使うとres_vpaの中身が確認できる
+names(res_vpa)
+
+# 推定されたFの値（まずここがちゃんとした値になってるか確認）
+res_vpa$term.f
+
+# F at age：この例の場合は引数がちゃんと指定されていないため、計算がちゃんとできていないことがわかる
+res_vpa$faa
+
+# inputという帰り値には、vpa関数を実行したときに渡した引数がリスト形式で格納されているので、VPAがどんな設定で計算されたかを確認したいときに便利
+res_vpa$input
+
+# do.callを使うと同じ計算が再現できる
+res_vpa2 <- do.call(vpa, res_vpa$input)
+
+# 設定をちょっと変えた計算を行う
+input2 <- res_vpa$input
+input2$Pope <- TRUE
+res_vpa3 <- do.call(vpa, input2)
+
 
 #'
 #' ### 演習④ いろいろな設定のVPAを試そう

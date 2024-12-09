@@ -16,9 +16,10 @@
 - [SSPM](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/SSPM): spictを用いた状態空間モデルの実践
 - [Type1A](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/Type1A): 1A系資源の資源評価計算・将来予測について
 - [Type2](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/Type2): 2系資源の資源管理について
-
+- [Data-limited](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/Data-limited): データ不足資源について
 
 ## 更新
+- (2024/12/09) 2024年度ハイブリッド型資源管理研修の資料を追加しました
 - (2024/11/28) 2024年度資源管理研修会用のページに更新しました
 - (2024/10/13) Rのページを更新しました
 - (2023/12/14) Type1Aのスライドを追加しました
@@ -43,6 +44,7 @@
 
 ## 2024年度配布ファイル
 
+- [ハイブリッド型研修用資料](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/Data-limited)
 - [R初心者講習 多変量解析用データ](https://github.com/KoHMB/Shigen_kensyu_FRA/tree/main/R)
 
 ## 2023年度配布ファイル
